@@ -7,9 +7,14 @@ import { Pool } from 'pg';
 import * as schema from './schema';
 
 // --- Debugging Utilities ---
-const logDir  = path.join(process.cwd(), 'logs');
+const isServerless = !!process.env.VERCEL;
+const logDir  = isServerless ? '/tmp/logs' : path.join(process.cwd(), 'logs');
 const logFile = path.join(logDir, 'db_debug.log');
-if (!fs.existsSync(logDir)) fs.mkdirSync(logDir, { recursive: true });
+try {
+  if (!fs.existsSync(logDir)) fs.mkdirSync(logDir, { recursive: true });
+} catch {
+  // ignore — read-only filesystem (e.g. some serverless environments)
+}
 
 function logDb(msg: string, ...args: unknown[]) {
   const timestamp = new Date().toISOString();
