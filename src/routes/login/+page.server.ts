@@ -7,9 +7,7 @@ import { eq, and, gte, sql } from "drizzle-orm";
 
 const MAX_ATTEMPTS = 3;
 const LOCKOUT_WINDOW_MINUTES = 1;
-let isLoading = false;
-let showPassword = false;
-let rememberMe = false;
+
 
 function getClientIP(request: Request): string {
     const forwarded = request.headers.get('x-forwarded-for');
