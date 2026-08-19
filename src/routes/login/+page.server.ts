@@ -5,8 +5,11 @@ import { db } from "$lib/server/db";
 import { users, loginAuditLog } from "$lib/server/db/schema";
 import { eq, and, gte, sql } from "drizzle-orm";
 
-const MAX_ATTEMPTS = 10;
-const LOCKOUT_WINDOW_MINUTES = 15;
+const MAX_ATTEMPTS = 3;
+const LOCKOUT_WINDOW_MINUTES = 1;
+let isLoading = false;
+let showPassword = false;
+let rememberMe = false;
 
 function getClientIP(request: Request): string {
     const forwarded = request.headers.get('x-forwarded-for');
@@ -79,6 +82,7 @@ export const actions: Actions = {
         const data = await request.formData();
         const username = data.get("username")?.toString().trim();
         const password = data.get("password")?.toString();
+        const rememberMe = data.get("rememberMe") === "on";
         console.log('[LOGIN] Submitted username:', username);
 
         if (!username || !password) {
@@ -97,7 +101,9 @@ export const actions: Actions = {
         if (lockout.locked) {
             console.warn(`[LOGIN] Locked out: ${username} from IP: ${clientIP}`);
             return fail(429, {
-                error: `Too many failed attempts. Try again in ${Math.ceil((lockout.retryAfterSeconds ?? 900) / 60)} minutes.`
+                error: `Too many failed attempts. Try again in ${Math.ceil((lockout.retryAfterSeconds ?? 900) / 60)} minutes.`,
+                locked: true,
+                retryAfterSeconds: lockout.retryAfterSeconds ?? 900
             });
         }
 
@@ -114,7 +120,7 @@ export const actions: Actions = {
 
         if (userResult.length === 0) {
             console.warn('[LOGIN] No user found for username:', username);
-           await recordLoginAttempt({ userId: 0, username, ipAddress: clientIP, userAgent, status: 'failed' });
+            await recordLoginAttempt({ userId: 0, username, ipAddress: clientIP, userAgent, status: 'failed' });
             await new Promise(r => setTimeout(r, 400));
             return fail(401, { error: "Invalid username or password" });
         }
@@ -149,6 +155,9 @@ export const actions: Actions = {
         await recordLoginAttempt({ userId: dbUser.id, username, ipAddress: clientIP, userAgent, status: 'success' });
 
         try {
+            const SHORT_SESSION = 60 * 60 * 8;      // 8 hours — normal session
+            const REMEMBER_SESSION = 60 * 60 * 24 * 30; // 30 days — "Remember me"
+
             cookies.set(
                 "session",
                 JSON.stringify({ id: dbUser.id, role: dbUser.role, username: dbUser.username }),
@@ -157,7 +166,7 @@ export const actions: Actions = {
                     httpOnly: true,
                     sameSite: "strict",
                     secure: isProduction,
-                    maxAge: 60 * 60 * 24 * 7,
+                    maxAge: rememberMe ? REMEMBER_SESSION : SHORT_SESSION,
                     domain: undefined
                 }
             );

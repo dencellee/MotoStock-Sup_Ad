@@ -4,8 +4,37 @@
 
 	let isLoading = false;
 	let showPassword = false;
+	let rememberMe = false;
 	export let form;
 	$: errorMessage = form?.error;
+
+	let lockoutSeconds = 0;
+	let lockoutInterval: ReturnType<typeof setInterval> | null = null;
+	let lastHandledForm: any = null;
+	
+
+	$: if (form?.locked && form !== lastHandledForm) {
+		lastHandledForm = form;
+		startLockoutCountdown(form.retryAfterSeconds ?? 900);
+	}
+
+	function startLockoutCountdown(seconds: number) {
+		lockoutSeconds = seconds;
+		if (lockoutInterval) clearInterval(lockoutInterval);
+		lockoutInterval = setInterval(() => {
+			lockoutSeconds -= 1;
+			if (lockoutSeconds <= 0) {
+				lockoutSeconds = 0;
+				if (lockoutInterval) clearInterval(lockoutInterval);
+			}
+		}, 1000);
+	}
+
+		function formatCountdown(sec: number): string {
+		const m = Math.floor(sec / 60);
+		const s = sec % 60;
+		return `${m}:${s.toString().padStart(2, '0')}`;
+	}
 
 	function togglePassword() {
 		showPassword = !showPassword;
@@ -67,7 +96,7 @@
 						type="text"
 						placeholder="Admin ID or Username"
 						required
-						disabled={isLoading}
+						disabled={isLoading || lockoutSeconds > 0}
 						autocomplete="username"
 					/>
 				</div>
@@ -83,7 +112,7 @@
 						type={showPassword ? 'text' : 'password'}
 						placeholder="••••••••"
 						required
-						disabled={isLoading}
+						disabled={isLoading || lockoutSeconds > 0}
 						autocomplete="current-password"
 						on:input={onPasswordInput}
 						minlength="8"
@@ -131,9 +160,22 @@
 					</button>
 				</div>
 			</div>
-			<button type="submit" class:loading={isLoading} disabled={isLoading} aria-busy={isLoading}>
+				<div class="remember-row">
+					<label class="checkbox-label">
+						<input type="checkbox" name="rememberMe" bind:checked={rememberMe} disabled={isLoading || lockoutSeconds > 0} />
+						Remember me for 30 days
+					</label>
+			</div>
+			<button
+				type="submit"
+				class:loading={isLoading}
+				disabled={isLoading || lockoutSeconds > 0}
+				aria-busy={isLoading}
+			>
 				{#if isLoading}
 					<div class="spinner"></div>
+				{:else if lockoutSeconds > 0}
+					Locked — {formatCountdown(lockoutSeconds)}
 				{:else}
 					Sign In to Dashboard
 				{/if}
@@ -373,6 +415,28 @@
 		stroke-width: 2;
 		fill: none;
 		pointer-events: none;
+	}
+		.remember-row {
+		display: flex;
+		align-items: center;
+		margin-bottom: 20px;
+	}
+
+	.checkbox-label {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		font-size: 0.85rem;
+		color: var(--text-slate);
+		cursor: pointer;
+		font-weight: 400;
+	}
+
+	.checkbox-label input[type='checkbox'] {
+		width: 16px;
+		height: 16px;
+		accent-color: var(--brand-primary);
+		cursor: pointer;
 	}
 
 </style>
