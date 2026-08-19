@@ -1,53 +1,70 @@
 <script lang="ts">
-	import { onMount, afterUpdate } from 'svelte';
-	import { goto, invalidateAll } from '$app/navigation';
-	import Chart from 'chart.js/auto';
-	import LoginHistory from '$lib/components/LoginHistory.svelte';
+	import { onMount, afterUpdate } from "svelte";
+	import { goto, invalidateAll } from "$app/navigation";
+	import Chart from "chart.js/auto";
+	import LoginHistory from "$lib/components/LoginHistory.svelte";
 
 	export let data: any;
 	let loading = true;
 	$: loading = data?.stats === undefined || data?.chartData === undefined;
 
 	let revenueCanvas: HTMLCanvasElement;
-	let unitsCanvas: HTMLCanvasElement;
-	let comparisonCanvas: HTMLCanvasElement;
 	let topProductsCanvas: HTMLCanvasElement;
 	let charts: Chart[] = [];
 	let showLowStockModal = false;
+	let selectedBrand = "all";
+	let brandDropdownOpen = false;
 
+	$: brandOptions = data?.lowStockItems
+	? (Array.from(
+			new Set(
+				data.lowStockItems.map((i: any) => String(i.brand)).filter(Boolean),
+			),
+		) as string[]).sort()
+	: [];
+
+	$: filteredLowStock =
+		selectedBrand === "all"
+			? data.lowStockItems
+			: data.lowStockItems.filter((i: any) => i.brand === selectedBrand);
+
+	$: if (selectedBrand !== "all" && !brandOptions.includes(selectedBrand)) {
+		selectedBrand = "all";
+	}
+
+	function selectBrand(brand: string) {
+		selectedBrand = brand;
+		brandDropdownOpen = false;
+	}
+
+	function closeBrandDropdown() {
+		brandDropdownOpen = false;
+	}
 	const colors = {
-		revenue: '#2563eb',
-		units: '#7c3aed',
-		profit: '#10b981',
-		capital: '#1e293b',
-		expense: '#f43f5e',
-		primary: '#2563eb',
-		secondary: '#7c3aed'
+		revenue: "#2563eb",
+		primary: "#2563eb",
+		secondary: "#7c3aed",
 	};
 
 	const fmt = (v: number) =>
-		new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(v);
-
-	// --- CHART FORMATTING HELPERS ---
-	function formatLabels(labels: string[]) {
-		// We use the labels directly from our new backend logic (H:00, m/d, or Week X)
-		return labels;
-	}
+		new Intl.NumberFormat("en-PH", {
+			style: "currency",
+			currency: "PHP",
+		}).format(v);
 
 	let lastUpdated = new Date().toLocaleTimeString();
 
 	onMount(() => {
 		initCharts();
 
-		// Set interval to refresh data (e.g., every 2 minutes)
 		const interval = setInterval(
 			async () => {
 				await invalidateAll();
 				lastUpdated = new Date().toLocaleTimeString();
-				console.log('Dashboard Synced at:', lastUpdated);
+				console.log("Dashboard Synced at:", lastUpdated);
 			},
-			1000 * 60 * 2
-		); // 2 minutes
+			1000 * 60 * 2,
+		);
 
 		return () => {
 			clearInterval(interval);
@@ -56,7 +73,6 @@
 	});
 
 	afterUpdate(() => {
-		// This will trigger automatically after invalidateAll() fetches new data
 		destroyCharts();
 		initCharts();
 	});
@@ -73,149 +89,69 @@
 			responsive: true,
 			maintainAspectRatio: false,
 			plugins: {
-				legend: { display: false } // We'll rely on the card titles
+				legend: { display: false },
 			},
 			scales: {
 				x: { grid: { display: false }, ticks: { font: { size: 11 } } },
-				y: { grid: { color: '#f3f4f6' }, beginAtZero: true, ticks: { font: { size: 11 } } }
-			}
+				y: {
+					grid: { color: "#f3f4f6" },
+					beginAtZero: true,
+					ticks: { font: { size: 11 } },
+				},
+			},
 		};
 
 		// 1. Revenue Flow (Line)
 		if (revenueCanvas) {
 			charts.push(
 				new Chart(revenueCanvas, {
-					type: 'line',
+					type: "line",
 					data: {
 						labels: data.chartData.labels,
 						datasets: [
 							{
-								label: 'Revenue',
+								label: "Revenue",
 								data: data.chartData.revenue,
 								borderColor: colors.revenue,
-								backgroundColor: 'rgba(37,99,235,0.1)',
+								backgroundColor: "rgba(37,99,235,0.1)",
 								fill: true,
 								tension: 0.4,
-								pointRadius: 4
-							}
-						]
-					},
-					options: baseOptions
-				})
-			);
-		}
-
-		// 2. Sales Velocity (Line)
-		if (unitsCanvas) {
-			charts.push(
-				new Chart(unitsCanvas, {
-					type: 'line',
-					data: {
-						labels: data.chartData.labels,
-						datasets: [
-							{
-								label: 'Units',
-								data: data.chartData.units,
-								borderColor: colors.units,
-								tension: 0.4,
-								borderDash: [4, 4]
-							}
-						]
-					},
-					options: baseOptions
-				})
-			);
-		}
-
-		// 3. Profitability Analysis (Grouped Bar)
-		if (comparisonCanvas) {
-			charts.push(
-				new Chart(comparisonCanvas, {
-					type: 'bar',
-					data: {
-						labels: data.chartData.labels,
-						datasets: [
-							{
-								label: 'Revenue',
-								data: data.chartData.revenue,
-								backgroundColor: colors.revenue,
-								borderRadius: 6,
-								// Fixes the width and centering
-								barPercentage: 0.8,
-								categoryPercentage: 0.8,
-								maxBarThickness: 45
+								pointRadius: 4,
 							},
-							{
-								label: 'Capital',
-								data: data.chartData.expenses,
-								backgroundColor: colors.capital,
-								borderRadius: 6,
-								barPercentage: 0.8,
-								categoryPercentage: 0.8,
-								maxBarThickness: 45
-							},
-							{
-								label: 'Profit',
-								data: data.chartData.revenue.map(
-									(r: number, i: number) => r - data.chartData.expenses[i]
-								),
-								backgroundColor: colors.profit,
-								borderRadius: 6,
-								barPercentage: 0.8,
-								categoryPercentage: 0.8,
-								maxBarThickness: 45
-							}
-						]
+						],
 					},
-					options: {
-						...baseOptions,
-						scales: {
-							...baseOptions.scales,
-							x: {
-								// This ensures the group of bars centers itself on the label
-								grid: { display: false },
-								offset: true,
-								stacked: false
-							}
-						},
-						plugins: {
-							legend: {
-								display: true,
-								position: 'top',
-								labels: {
-									usePointStyle: true,
-									padding: 20,
-									font: { family: 'Inter', size: 12, weight: 'normal' }
-								}
-							}
-						}
-					}
-				})
+					options: baseOptions,
+				}),
 			);
 		}
 
-		// 4. Top Sellers (Horizontal Bar)
+		// 2. Top 10 Sellers (Horizontal Bar)
 		if (topProductsCanvas && data.topSellingProducts.length > 0) {
 			charts.push(
 				new Chart(topProductsCanvas, {
-					type: 'bar',
+					type: "bar",
 					data: {
 						labels: data.topSellingProducts.map((p: any) => p.name),
 						datasets: [
 							{
-								label: 'Sold',
-								data: data.topSellingProducts.map((p: any) => p.sold),
+								label: "Sold",
+								data: data.topSellingProducts.map(
+									(p: any) => p.sold,
+								),
 								backgroundColor: colors.revenue,
-								borderRadius: 6
-							}
-						]
+								borderRadius: 6,
+							},
+						],
 					},
 					options: {
 						...baseOptions,
-						indexAxis: 'y',
-						scales: { x: { grid: { display: false } }, y: { grid: { display: false } } }
-					}
-				})
+						indexAxis: "y",
+						scales: {
+							x: { grid: { display: false } },
+							y: { grid: { display: false } },
+						},
+					},
+				}),
 			);
 		}
 	}
@@ -234,15 +170,15 @@
 					<select
 						class="filter-select"
 						value={data.activeFilter}
-						on:change={(e) => goto(`?filter=${e.currentTarget.value}`)}
+						on:change={(e) =>
+							goto(`?filter=${e.currentTarget.value}`)}
 					>
-						<option value="daily">Daily</option>
-						<option value="weekly">Weekly</option>
-						<option value="monthly">Monthly</option>
-						<option value="allTime">All Time</option>
+						<option value="daily">This Day</option>
+						<option value="weekly">This Week</option>
+						<option value="monthly">This Month</option>
+						<option value="yearly">This Year</option>
 					</select>
 
-					<!-- Custom SVG Chevron to keep the design clean -->
 					<div class="select-icon">
 						<svg
 							width="14"
@@ -260,7 +196,10 @@
 				</div>
 
 				{#if data.stats.lowStockCount > 0}
-					<button class="btn-alert" on:click={() => (showLowStockModal = true)}>
+					<button
+						class="btn-alert"
+						on:click={() => (showLowStockModal = true)}
+					>
 						<div class="pulse-dot-alert"></div>
 						<span>{data.stats.lowStockCount} Alerts</span>
 					</button>
@@ -292,8 +231,11 @@
 				<div class="metric-card">
 					<div class="card-head">
 						<div class="icon-box blue">💰</div>
-						<div class="trend-pill" class:neg={data.stats.salesChange < 0}>
-							{data.stats.salesChange >= 0 ? '↑' : '↓'}
+						<div
+							class="trend-pill"
+							class:neg={data.stats.salesChange < 0}
+						>
+							{data.stats.salesChange >= 0 ? "↑" : "↓"}
 							{Math.abs(data.stats.salesChange)}%
 						</div>
 					</div>
@@ -301,11 +243,13 @@
 						<p class="label">Total Revenue</p>
 						<h3>{fmt(data.stats.totalSales)}</h3>
 						<p class="sub-label">
-							vs previous {data.activeFilter === 'daily'
-								? 'day'
-								: data.activeFilter === 'weekly'
-									? 'week'
-									: 'month'}
+							vs previous {data.activeFilter === "daily"
+								? "day"
+								: data.activeFilter === "weekly"
+									? "week"
+									: data.activeFilter === "monthly"
+										? "month"
+										: "year"}
 						</p>
 					</div>
 				</div>
@@ -317,7 +261,9 @@
 					<div class="card-body">
 						<p class="label">Product Capital</p>
 						<h3>{fmt(data.stats.stockCost)}</h3>
-						<p class="sub-label opacity-60">Inventory value at sale</p>
+						<p class="sub-label opacity-60">
+							Inventory value at sale
+						</p>
 					</div>
 				</div>
 
@@ -329,7 +275,7 @@
 							class:neg={data.stats.expChange > 0}
 							class:pos={data.stats.expChange <= 0}
 						>
-							{data.stats.expChange > 0 ? '↑' : '↓'}
+							{data.stats.expChange > 0 ? "↑" : "↓"}
 							{Math.abs(data.stats.expChange)}%
 						</div>
 					</div>
@@ -345,13 +291,19 @@
 						<div class="icon-box green">📈</div>
 						<div class="margin-badge">
 							{data.stats.totalSales > 0
-								? ((data.stats.netProfit / data.stats.totalSales) * 100).toFixed(0)
+								? (
+										(data.stats.netProfit /
+											data.stats.totalSales) *
+										100
+									).toFixed(0)
 								: 0}% Margin
 						</div>
 					</div>
 					<div class="card-body">
 						<p class="label">Net Profit</p>
-						<h3 class="text-emerald">{fmt(data.stats.netProfit)}</h3>
+						<h3 class="text-emerald">
+							{fmt(data.stats.netProfit)}
+						</h3>
 						<p class="sub-label">Take-home earnings</p>
 					</div>
 				</div>
@@ -365,22 +317,16 @@
 							<p class="subtitle">Real-time performance</p>
 						</div>
 					</div>
-					<div class="canvas-wrapper"><canvas bind:this={revenueCanvas}></canvas></div>
-				</div>
-
-				<div class="chart-card">
-					<div>
-						<h4>Sales Volume</h4>
-						<p class="subtitle">Unit transaction density</p>
+					<div class="canvas-wrapper">
+						<canvas bind:this={revenueCanvas}></canvas>
 					</div>
-					<div class="canvas-wrapper"><canvas bind:this={unitsCanvas}></canvas></div>
 				</div>
 
 				<div class="chart-card span-2">
 					<div class="chart-header">
 						<div class="header-left">
-							<h4>Profitability Analysis</h4>
-							<p class="subtitle">Revenue vs Capital vs Net Profit</p>
+							<h4>Top 10 Performing Products</h4>
+							<p class="subtitle">Ranked by units sold</p>
 						</div>
 
 						<div class="sync-status">
@@ -388,23 +334,18 @@
 								<div class="pulse-dot"></div>
 								<div class="pulse-ring"></div>
 							</div>
-							<span class="sync-text">LATEST SYNC: {lastUpdated}</span>
+							<span class="sync-text"
+								>LATEST SYNC: {lastUpdated}</span
+							>
 						</div>
 					</div>
 
-					<div class="canvas-wrapper large">
-						<canvas bind:this={comparisonCanvas}></canvas>
-					</div>
-				</div>
-				<div class="chart-card">
-					<div>
-						<h4>Top Performing Products</h4>
-						<p class="subtitle">Ranked by volume</p>
-					</div>
 					{#if data.topSellingProducts.length === 0}
 						<div class="empty-state">No sales in this period</div>
 					{:else}
-						<div class="canvas-wrapper"><canvas bind:this={topProductsCanvas}></canvas></div>
+						<div class="canvas-wrapper large">
+							<canvas bind:this={topProductsCanvas}></canvas>
+						</div>
 					{/if}
 				</div>
 
@@ -419,7 +360,9 @@
 								<div class="pay-info">
 									<span
 										class="dot"
-										style="background: {pay.mode === 'Cash' ? colors.primary : colors.secondary}"
+										style="background: {pay.mode === 'Cash'
+											? colors.primary
+											: colors.secondary}"
 									></span>
 									<span class="name">{pay.mode}</span>
 								</div>
@@ -441,42 +384,113 @@
 		tabindex="0"
 		on:click|self={() => (showLowStockModal = false)}
 		on:keydown={(e) => {
-			if (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ') showLowStockModal = false;
+			if (e.key === "Escape" || e.key === "Enter" || e.key === " ")
+				showLowStockModal = false;
 		}}
 	>
 		<div class="modal-box">
 			<div class="modal-header">
 				<h3>Inventory Alerts</h3>
 				<p>Items currently below safety levels.</p>
-			</div>
-			<div class="modal-content">
-				{#each data.lowStockItems as item}
-					<div class="alert-row">
-						<span class="alert-name">
-							{item.name}
-							{#if item.color || item.size}
-								<span class="alert-meta">
-									{item.color || 'N/A'}{item.size ? ` / ${item.size}` : ''}
-								</span>
-							{/if}
-						</span>
-						<span class="stock-tag">{item.stock} left</span>
+
+				{#if brandOptions.length > 1}
+					<div class="brand-filter-box">
+						<button
+							type="button"
+							class="brand-filter-trigger"
+							on:click={() =>
+								(brandDropdownOpen = !brandDropdownOpen)}
+						>
+							<span
+								>{selectedBrand === "all"
+									? "All Brands"
+									: selectedBrand}</span
+							>
+							<svg
+								width="12"
+								height="12"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								class:rotated={brandDropdownOpen}
+							>
+								<polyline points="6 9 12 15 18 9"></polyline>
+							</svg>
+						</button>
+
+						{#if brandDropdownOpen}
+							<div
+								class="brand-dropdown-backdrop"
+								role="presentation"
+								on:click={closeBrandDropdown}
+							></div>
+							<div class="brand-dropdown-list">
+								<button
+									type="button"
+									class="brand-option"
+									class:active={selectedBrand === "all"}
+									on:click={() => selectBrand("all")}
+								>
+									All Brands
+								</button>
+								{#each brandOptions as brand}
+									<button
+										type="button"
+										class="brand-option"
+										class:active={selectedBrand === brand}
+										on:click={() => selectBrand(brand)}
+									>
+										{brand}
+									</button>
+								{/each}
+							</div>
+						{/if}
 					</div>
-				{/each}
+				{/if}
 			</div>
-			<button class="btn-close" on:click={() => (showLowStockModal = false)}>Close Report</button>
+
+			<div class="modal-content">
+				{#if filteredLowStock.length === 0}
+					<div class="modal-empty">
+						No low stock items for this brand
+					</div>
+				{:else}
+					{#each filteredLowStock as item}
+						<div class="alert-row">
+							<span class="alert-name">
+								{item.name}
+								{#if item.color || item.size}
+									<span class="alert-meta">
+										{item.color || "N/A"}{item.size
+											? ` / ${item.size}`
+											: ""}
+									</span>
+								{/if}
+							</span>
+							<span class="stock-tag">{item.stock} left</span>
+						</div>
+					{/each}
+				{/if}
+			</div>
+			<button
+				class="btn-close"
+				on:click={() => (showLowStockModal = false)}
+				>Close Report</button
+			>
 		</div>
 	</div>
 {/if}
 
-<!-- 📍 Login History Monitoring Panel -->
 <LoginHistory />
 
 <style>
 	:global(body) {
 		margin: 0;
 		font-family:
-			'Inter',
+			"Inter",
 			-apple-system,
 			sans-serif;
 		background: #f8fafc;
@@ -828,6 +842,94 @@
 		border-radius: 12px;
 	}
 
+	.brand-filter-box {
+		margin-top: 0.75rem;
+	}
+
+	.brand-filter-box {
+		position: relative;
+		margin-top: 0.75rem;
+	}
+
+	.brand-filter-trigger {
+		width: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		background: #f8fafc;
+		border: 1px solid #e2e8f0;
+		border-radius: 10px;
+		padding: 8px 14px;
+		font-family: inherit;
+		font-size: 0.8rem;
+		font-weight: 600;
+		color: #0f172a;
+		cursor: pointer;
+	}
+
+	.brand-filter-trigger svg {
+		flex-shrink: 0;
+		color: #64748b;
+		transition: transform 0.15s ease;
+	}
+
+	.brand-filter-trigger svg.rotated {
+		transform: rotate(180deg);
+	}
+
+	.brand-dropdown-backdrop {
+		position: fixed;
+		inset: 0;
+		z-index: 150;
+	}
+
+	.brand-dropdown-list {
+		position: absolute;
+		top: calc(100% + 4px);
+		left: 0;
+		right: 0;
+		max-height: 240px;
+		overflow-y: auto;
+		background: white;
+		border: 1px solid #e2e8f0;
+		border-radius: 12px;
+		box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15);
+		z-index: 151;
+		padding: 6px;
+	}
+
+	.brand-option {
+		display: block;
+		width: 100%;
+		text-align: left;
+		background: none;
+		border: none;
+		padding: 10px 12px;
+		font-family: inherit;
+		font-size: 0.8rem;
+		font-weight: 500;
+		color: #0f172a;
+		border-radius: 8px;
+		cursor: pointer;
+	}
+
+	.brand-option:hover {
+		background: #f1f5f9;
+	}
+
+	.brand-option.active {
+		background: #eff6ff;
+		color: #2563eb;
+		font-weight: 700;
+	}
+
+	.modal-empty {
+		padding: 2rem 0;
+		text-align: center;
+		color: #94a3b8;
+		font-style: italic;
+		font-size: 0.85rem;
+	}
 	.pay-info {
 		display: flex;
 		align-items: center;
@@ -928,7 +1030,12 @@
 	}
 	.skeleton-line,
 	.skeleton-box {
-		background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+		background: linear-gradient(
+			90deg,
+			#f1f5f9 25%,
+			#e2e8f0 50%,
+			#f1f5f9 75%
+		);
 		background-size: 200% 100%;
 		animation: skeleton-shimmer 1.5s infinite linear;
 		border-radius: 8px;

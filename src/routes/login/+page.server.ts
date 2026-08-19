@@ -131,7 +131,7 @@ export const actions: Actions = {
                     path: "/",
                     httpOnly: true,           // Prevent JavaScript from accessing the cookie
                     sameSite: "strict",       // Only send cookie to same site (CSRF protection)
-                    secure: true,              // HTTPS only (always, even in dev)
+                    secure: isProduction,     // HTTPS only in production, allow HTTP in dev
                     maxAge: 60 * 60 * 24 * 7, // 7 days
                     domain: undefined          // Let browser use current domain
                 }

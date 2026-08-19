@@ -31,21 +31,24 @@
 	});
 </script>
 
-<div class="login-history-panel">
-	<div class="panel-header">
-		<h3>🔐 Admin Login History</h3>
-		<span class="login-count">{logins.length} recent logins</span>
+<div class="login-history-card">
+	<div class="card-header">
+		<div>
+			<h4>🔐 Login History</h4>
+			<p class="subtitle">Recent super admin access</p>
+		</div>
+		<span class="badge">{logins.length}</span>
 	</div>
 
 	{#if loading}
-		<div class="loading">Loading login history...</div>
+		<div class="state-message">Loading login history...</div>
 	{:else if error}
-		<div class="error">⚠️ {error}</div>
+		<div class="state-message error">⚠️ {error}</div>
 	{:else if logins.length === 0}
-		<div class="empty">No login activity recorded</div>
+		<div class="state-message">No login activity recorded</div>
 	{:else}
-		<div class="login-table-wrapper">
-			<table class="login-table">
+		<div class="table-wrapper">
+			<table>
 				<thead>
 					<tr>
 						<th>Time</th>
@@ -70,139 +73,155 @@
 </div>
 
 <style>
-	.login-history-panel {
+	.login-history-card {
 		background: white;
-		border-radius: 8px;
-		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
-		margin-top: 2rem;
+		border-radius: 24px;
+		border: 1px solid #e2e8f0;
+		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+		padding: 1.75rem;
+		margin-top: 2.5rem;
 		overflow: hidden;
 	}
 
-	.panel-header {
+	.card-header {
 		display: flex;
 		justify-content: space-between;
-		align-items: center;
-		padding: 1.5rem;
-		background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-		color: white;
-		border-bottom: 2px solid #38bdf8;
+		align-items: flex-start;
+		margin-bottom: 1.5rem;
+		gap: 1rem;
 	}
 
-	.panel-header h3 {
-		margin: 0;
-		font-size: 1.1rem;
+	.card-header h4 {
+		margin: 0 0 0.25rem 0;
+		font-size: 1.125rem;
 		font-weight: 600;
+		color: #0f172a;
 	}
 
-	.login-count {
-		background: rgba(56, 189, 248, 0.2);
-		padding: 0.25rem 0.75rem;
-		border-radius: 20px;
-		font-size: 0.85rem;
-		color: #38bdf8;
-		font-weight: 500;
+	.subtitle {
+		margin: 0;
+		font-size: 0.875rem;
+		color: #64748b;
+		font-weight: 400;
 	}
 
-	.loading,
-	.error,
-	.empty {
+	.badge {
+		background: #eff6ff;
+		color: #0369a1;
+		padding: 0.375rem 0.75rem;
+		border-radius: 12px;
+		font-size: 0.875rem;
+		font-weight: 600;
+		white-space: nowrap;
+		flex-shrink: 0;
+	}
+
+	.state-message {
 		padding: 2rem;
 		text-align: center;
 		color: #64748b;
 		font-size: 0.95rem;
 	}
 
-	.error {
+	.state-message.error {
 		background: #fef2f2;
 		color: #991b1b;
+		border-radius: 12px;
 	}
 
-	.login-table-wrapper {
+	.table-wrapper {
 		overflow-x: auto;
+		overflow-y: auto;
+		max-height: 400px;
+		border-top: 1px solid #e2e8f0;
 	}
 
-	.login-table {
+	table {
 		width: 100%;
 		border-collapse: collapse;
-		font-size: 0.9rem;
+		font-size: 0.875rem;
 	}
 
-	.login-table thead {
-		background: #f1f5f9;
-		border-bottom: 2px solid #cbd5e1;
+	thead {
+		position: sticky;
+		top: 0;
+		background: #f8fafc;
+		border-bottom: 1px solid #e2e8f0;
 	}
 
-	.login-table th {
-		padding: 1rem;
+	th {
+		padding: 0.875rem 1rem;
 		text-align: left;
 		font-weight: 600;
-		color: #1e293b;
-		font-size: 0.85rem;
+		color: #64748b;
+		font-size: 0.8125rem;
 		text-transform: uppercase;
 		letter-spacing: 0.5px;
 	}
 
-	.login-table tbody tr {
-		border-bottom: 1px solid #e2e8f0;
-		transition: background 0.2s;
+	tbody tr {
+		border-bottom: 1px solid #f1f5f9;
+		transition: background-color 0.15s;
 	}
 
-	.login-table tbody tr:hover {
+	tbody tr:hover {
 		background: #f8fafc;
 	}
 
-	.login-table tbody tr:nth-child(even) {
-		background: #f8fafc;
-	}
-
-	.login-table td {
-		padding: 1rem;
+	td {
+		padding: 0.875rem 1rem;
 		color: #334155;
 	}
 
-	.login-table .time {
+	.time {
 		font-weight: 500;
 		color: #0f172a;
-		font-family: 'Monaco', 'Courier New', monospace;
-		font-size: 0.85rem;
+		font-size: 0.8125rem;
+		white-space: nowrap;
 	}
 
-	.login-table .username {
-		color: #38bdf8;
+	.username {
+		color: #2563eb;
 		font-weight: 600;
 	}
 
-	.login-table .ip {
+	.ip {
 		font-family: 'Monaco', 'Courier New', monospace;
-		font-size: 0.85rem;
+		font-size: 0.8125rem;
 		color: #64748b;
 	}
 
-	.login-table .browser {
+	.browser {
 		color: #475569;
+		font-size: 0.875rem;
 	}
 
 	@media (max-width: 768px) {
-		.panel-header {
+		.login-history-card {
+			padding: 1.25rem;
+			border-radius: 16px;
+		}
+
+		.card-header {
 			flex-direction: column;
-			gap: 0.75rem;
-			text-align: center;
+			align-items: flex-start;
 		}
 
-		.login-table {
-			font-size: 0.8rem;
+		.table-wrapper {
+			max-height: 300px;
 		}
 
-		.login-table th,
-		.login-table td {
-			padding: 0.75rem 0.5rem;
+		th,
+		td {
+			padding: 0.625rem 0.75rem;
 		}
 
-		.login-table .time {
-			max-width: 120px;
-			white-space: nowrap;
-			overflow: hidden;
-			text-overflow: ellipsis;
+		th {
+			font-size: 0.75rem;
+		}
+
+		td {
+			font-size: 0.8125rem;
 		}
 	}
 </style>

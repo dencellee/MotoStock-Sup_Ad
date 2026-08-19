@@ -1,20 +1,23 @@
 <!doctype html>
-<html lang="en" style="margin: 0; padding: 0; height: 100%;"> <head>
-    <meta charset="utf-8" />
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<link rel="icon" href="%sveltekit.assets%/favicon.png" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <link rel="icon" type="image/png" href="/favicon.png" />
-    <link rel="apple-touch-icon" href="/favicon.png" />
+	<!-- PWA: manifest + theme color -->
+	<link rel="manifest" href="/manifest.webmanifest" />
+	<meta name="theme-color" content="#0f172a" />
 
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet"
-    />
-    %sveltekit.head%
+	<!-- iOS Safari doesn't read the manifest for these — needs its own tags -->
+	<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+	<meta name="apple-mobile-web-app-capable" content="yes" />
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+	<meta name="apple-mobile-web-app-title" content="MotoStock" />
+
+	%sveltekit.head%
 </head>
-<body data-sveltekit-preload-data="hover" style="margin: 0; padding: 0; height: 100%;">
-    <div style="display: contents">%sveltekit.body%</div>
+<body data-sveltekit-preload-data="hover">
+	<div style="display: contents">%sveltekit.body%</div>
 </body>
 </html>

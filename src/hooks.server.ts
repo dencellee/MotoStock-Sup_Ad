@@ -3,8 +3,7 @@ import type { Handle } from '@sveltejs/kit';
 import { redirect } from '@sveltejs/kit';
 import { createReadStream, existsSync } from 'fs';
 import { Readable } from 'stream';
-import { resolve as pathResolve } from 'path';
-import { waitForDb } from '$lib/server/db';
+import { waitForDb } from './lib/server/db';
 
 
 // // Track up to 3 unique client IPs
@@ -15,9 +14,9 @@ let dbReady = false;
 const dbReadyPromise = waitForDb().then(() => {
     dbReady = true;
     console.log('[hooks.server] Database ready');
-}).catch(err => {
+}).catch((err: unknown) => {
     console.error('[hooks.server] Database initialization failed:', err);
-    process.exit(1);
+    // Don't exit - let the app handle the error gracefully
 });
 
 
@@ -61,7 +60,7 @@ export const handle: Handle = async ({ event, resolve }) => {
                     console.log('[hooks.server] session cookie:', event.cookies.get('session'));
                 }
             }
-        } catch (err) {
+        } catch (err: unknown) {
             console.warn('Failed to parse session cookie');
             event.cookies.delete('session', { path: '/' });
             event.locals.user = null;

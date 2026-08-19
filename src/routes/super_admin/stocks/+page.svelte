@@ -1,84 +1,155 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import { fade, scale } from 'svelte/transition';
-	import { browser } from '$app/environment';
-	import JsBarcode from 'jsbarcode';
-	import { tick } from 'svelte';
-	import { supabase } from '$lib/supabase';
+	import { onMount, tick } from "svelte";
+	import { fade, scale } from "svelte/transition";
+	import { browser } from "$app/environment";
+	import { supabase } from "$lib/supabase";
 
-	let products: any[] = [];
-	let categoriesList: any[] = [];
+	interface Product {
+		id: number;
+		name: string;
+		brand: string;
+		categoryId: number | string;
+		categoryName?: string;
+		barcode: string;
+		color: string;
+		size: string;
+		price: number;
+		cost: number;
+		quantity: number;
+		createdAt?: string;
+	}
+
+	interface Category {
+		id: number | string;
+		name: string;
+	}
+
+	let products: Product[] = [];
+	let categoriesList: Category[] = [];
 	let loading = true;
+	let JsBarcode: any;
 	let showModal = false;
-	let productToDelete: any = null;
-	let sortField = 'quantity';
-	let sortDirection = -1;
-	let searchQuery = '';
-	let selectedProduct: any = null;
-	let selectedCategoryFilter = '';
-	let toast = { show: false, message: '', type: 'success' as 'success' | 'error' };
+	let productToDelete: Product | null = null;
+	let sortField: keyof Product = "quantity";
+	let sortDirection: 1 | -1 = -1;
+	let searchQuery = "";
+	let selectedProduct: Product | null = null;
+	let selectedCategoryFilter = "";
+	let toast = {
+		show: false,
+		message: "",
+		type: "success" as "success" | "error",
+	};
 
-	let realtimeStatus = 'connecting';
+	let realtimeStatus = "connecting";
 
-	onMount(() => {
-		console.info('[renderer] products page mounted');
-		loadInitialData(); // your existing call
-
-		// ✅ Realtime — refresh when any PC changes products
-		const channel = supabase
-			.channel('admin-products-realtime')
-			.on(
-				'postgres_changes',
-				{
-					event: '*', // INSERT, UPDATE, DELETE
-					schema: 'public',
-					table: 'products'
-				},
-				async (payload) => {
-					console.log('[Realtime] Product changed:', payload);
-					// Silent refresh: fetch new products, update products array, do not show loading
-					try {
-						const { getApiBaseUrl } = await import('$lib/utils/apiBase');
-						const prodRes = await fetch(getApiBaseUrl() + '/api/products');
-						if (prodRes.ok) {
-							const newProducts = await prodRes.json();
-							products = [...newProducts]; // force Svelte reactivity
-						} else {
-							console.error('[products] silent fetch failed', {
-								endpoint: '/api/products',
-								status: prodRes.status,
-								statusText: prodRes.statusText
-							});
-						}
-					} catch (err) {
-						console.error('[products] silent refresh error', err);
-					}
-				}
-			)
-			.subscribe((status) => {
-				realtimeStatus = status;
-				console.log('[Realtime] Channel status:', status);
-			});
-
-		return () => supabase.removeChannel(channel);
-	});
+	let barcodeSvg: SVGSVGElement;
 
 	let form = {
 		id: null as number | null,
-		// SKU REMOVED FROM HERE
-		name: '',
-		brand: '',
-		categoryId: '',
-		barcode: '',
-		color: '',
-		size: '',
+		name: "",
+		brand: "",
+		categoryId: "",
+		barcode: "",
+		color: "",
+		size: "",
 		price: 0,
 		cost: 0,
 		quantity: 0,
-		quantity_to_add: 0
+		quantity_to_add: 0,
 	};
 
-	let barcodeSvg: SVGSVGElement;
+	// --- PAGINATION STATE ---
+	const PAGE_SIZE = 25;
+	let visibleCount = PAGE_SIZE;
+	let tableContainerEl: HTMLDivElement;
+
+	// --- BRAND FILTER STATE ---
+	let selectedBrandFilter = "";
+
+	onMount(() => {
+		console.info("[renderer] products page mounted");
+		loadInitialData();
+		window.addEventListener('scroll', handleWindowScroll, { passive: true });
+
+		const channel = supabase
+			.channel("admin-products-realtime")
+			.on(
+				"postgres_changes",
+				{
+					event: "*",
+					schema: "public",
+					table: "products",
+				},
+				async (payload: unknown) => {
+					console.log("[Realtime] Product changed:", payload);
+					try {
+						const { getApiBaseUrl } = await import(
+							"$lib/utils/apiBase"
+						);
+						const prodRes = await fetch(
+							getApiBaseUrl() + "/api/products",
+						);
+						if (prodRes.ok) {
+							const newProducts = await prodRes.json();
+							products = [...newProducts];
+						} else {
+							console.error("[products] silent fetch failed", {
+								endpoint: "/api/products",
+								status: prodRes.status,
+								statusText: prodRes.statusText,
+							});
+						}
+					} catch (err) {
+						console.error("[products] silent refresh error", err);
+					}
+				},
+			)
+			.subscribe((status: string) => {
+				realtimeStatus = status;
+				console.log("[Realtime] Channel status:", status);
+			});
+
+		return () => {
+	window.removeEventListener('scroll', handleWindowScroll);
+	supabase.removeChannel(channel);
+};
+	});
+	// --- CUSTOM DROPDOWN STATE ---
+	let categoryDropdownOpen = false;
+	let brandDropdownOpen = false;
+
+	function toggleCategoryDropdown() {
+		categoryDropdownOpen = !categoryDropdownOpen;
+		brandDropdownOpen = false;
+	}
+
+	function toggleBrandDropdown() {
+		brandDropdownOpen = !brandDropdownOpen;
+		categoryDropdownOpen = false;
+	}
+
+	function selectCategory(id: string) {
+		selectedCategoryFilter = id;
+		categoryDropdownOpen = false;
+	}
+
+	function selectBrand(brand: string) {
+		selectedBrandFilter = brand;
+		brandDropdownOpen = false;
+	}
+
+	function closeDropdowns() {
+		categoryDropdownOpen = false;
+		brandDropdownOpen = false;
+	}
+
+	$: selectedCategoryName =
+		categoriesList.find(
+			(c) => String(c.id) === String(selectedCategoryFilter),
+		)?.name || "All Categories";
+
+	$: selectedBrandName = selectedBrandFilter || "All Brands";
 
 	$: if (selectedProduct) {
 		if (barcodeSvg && selectedProduct.barcode) {
@@ -86,20 +157,28 @@
 		}
 	}
 
-	// --- SKU AUTO-GENERATION BLOCK REMOVED ---
-
-	function showToast(message: string, type: 'success' | 'error' = 'success') {
+	function showToast(message: string, type: "success" | "error" = "success") {
 		toast = { show: true, message, type };
 		setTimeout(() => (toast.show = false), 3000);
 	}
+
+	// --- UNIQUE BRAND LIST ---
+	$: brandSuggestions = Array.from(
+		new Set(products.map((p) => String(p.brand)).filter(Boolean)),
+	).sort() as string[];
+
+	const normalizeText = (v: unknown): string =>
+		String(v ?? "")
+			.trim()
+			.toLowerCase();
 
 	// --- FILTER & SORT ---
 	$: displayedProducts = (products || [])
 		.filter((p) => {
 			const search = searchQuery.toLowerCase();
-			// Find the category name for this product
-			const categoryName = categoriesList.find((cat) => cat.id === p.categoryId)?.name || '';
-			// Combine all searchable fields into one string
+			const categoryName =
+				categoriesList.find((cat) => cat.id === p.categoryId)?.name ||
+				"";
 			const searchable = [
 				p.name,
 				p.brand,
@@ -107,115 +186,130 @@
 				String(p.price),
 				String(p.cost),
 				p.color,
-				p.size
+				p.size,
 			]
-				.map((v) => String(v ?? '').toLowerCase())
-				.join(' ');
+				.map((v) => String(v ?? "").toLowerCase())
+				.join(" ");
 
-			const matchesSearch = search === '' || searchable.includes(search);
+			const matchesSearch = search === "" || searchable.includes(search);
 			const matchesCategory =
-				selectedCategoryFilter === '' || String(p.categoryId) === String(selectedCategoryFilter);
+				selectedCategoryFilter === "" ||
+				String(p.categoryId) === String(selectedCategoryFilter);
+			const matchesBrand =
+				selectedBrandFilter === "" || p.brand === selectedBrandFilter;
 
-			return matchesSearch && matchesCategory;
+			return matchesSearch && matchesCategory && matchesBrand;
 		})
 		.sort((a, b) => {
 			const valA = a[sortField] ?? 0;
 			const valB = b[sortField] ?? 0;
-			if (typeof valA === 'string') return valA.localeCompare(valB) * sortDirection;
-			return valA < valB ? -1 * sortDirection : 1 * sortDirection;
+			if (typeof valA === "string" && typeof valB === "string") {
+				return valA.localeCompare(valB) * sortDirection;
+			}
+			return (valA < valB ? -1 : valA > valB ? 1 : 0) * sortDirection;
 		});
 
-	function toggleSort(field: string) {
+	// --- PAGINATION DERIVED STATE ---
+	let lastFilterKey = "";
+	$: filterKey = `${searchQuery}|${selectedCategoryFilter}|${selectedBrandFilter}`;
+	$: if (filterKey !== lastFilterKey) {
+		lastFilterKey = filterKey;
+		visibleCount = PAGE_SIZE;
+	}
+
+	$: pagedProducts = displayedProducts.slice(0, visibleCount);
+	$: hasMore = visibleCount < displayedProducts.length;
+
+	function handleWindowScroll() {
+	if (!tableContainerEl || !hasMore) return;
+	const rect = tableContainerEl.getBoundingClientRect();
+	const nearBottom = rect.bottom - window.innerHeight < 200;
+	if (nearBottom) {
+		visibleCount = Math.min(visibleCount + PAGE_SIZE, displayedProducts.length);
+	}
+}
+
+	function toggleSort(field: keyof Product) {
 		if (sortField === field) {
-			sortDirection *= -1;
+			sortDirection = (sortDirection * -1) as 1 | -1;
 		} else {
 			sortField = field;
 			sortDirection = -1;
 		}
 	}
-	async function openBarcode(product: any) {
+
+	async function openBarcode(product: Product) {
 		selectedProduct = product;
 
 		await tick();
 
 		if (barcodeSvg && selectedProduct.barcode) {
 			JsBarcode(barcodeSvg, selectedProduct.barcode, {
-				format: 'CODE128',
+				format: "CODE128",
 				width: 2,
 				height: 80,
-				displayValue: false
+				displayValue: false,
 			});
 		}
 	}
-	onMount(loadInitialData);
-	onMount(() => {
-		console.info('[renderer] products page mounted');
-	});
 
 	async function loadInitialData() {
 		loading = true;
 		try {
-			const { getApiBaseUrl } = await import('$lib/utils/apiBase');
+			const { getApiBaseUrl } = await import("$lib/utils/apiBase");
 			const [prodRes, catRes] = await Promise.all([
-				fetch(getApiBaseUrl() + '/api/products'),
-				fetch(getApiBaseUrl() + '/api/categories')
+				fetch(getApiBaseUrl() + "/api/products"),
+				fetch(getApiBaseUrl() + "/api/categories"),
 			]);
 
 			if (prodRes.ok) {
 				const newProducts = await prodRes.json();
-				// Force Svelte reactivity by assigning a new array reference
 				products = [...newProducts];
 			} else {
-				console.error('[products] fetch failed', {
-					endpoint: '/api/products',
+				console.error("[products] fetch failed", {
+					endpoint: "/api/products",
 					status: prodRes.status,
-					statusText: prodRes.statusText
+					statusText: prodRes.statusText,
 				});
 			}
 			if (catRes.ok) {
 				categoriesList = await catRes.json();
 			} else {
-				console.error('[categories] fetch failed', {
-					endpoint: '/api/categories',
+				console.error("[categories] fetch failed", {
+					endpoint: "/api/categories",
 					status: catRes.status,
-					statusText: catRes.statusText
+					statusText: catRes.statusText,
 				});
 			}
 		} catch (err) {
 			console.error(err);
-			showToast('Failed to load data', 'error');
+			showToast("Failed to load data", "error");
 		} finally {
 			loading = false;
 		}
 	}
-	// --- MODAL LOGIC ---
-	// Unique brand list for autocomplete
-	$: brandSuggestions = Array.from(new Set(products.map((p) => p.brand).filter(Boolean))).sort();
-	const normalizeText = (v: unknown) =>
-		String(v ?? '')
-			.trim()
-			.toLowerCase();
 
 	async function renderBarcodePreview(code: string) {
 		if (!browser || !code) return;
-		const { default: JsBarcode } = await import('jsbarcode');
-		const canvas = document.getElementById('barcode-canvas') as HTMLCanvasElement;
+		const { default: JsBarcodeLib } = await import("jsbarcode");
+		const canvas = document.getElementById(
+			"barcode-canvas",
+		) as HTMLCanvasElement | null;
 		if (!canvas) return;
 		try {
-			JsBarcode(canvas, code, {
-				format: 'CODE128',
+			JsBarcodeLib(canvas, code, {
+				format: "CODE128",
 				width: 2,
 				height: 50,
 				displayValue: true,
 				fontSize: 12,
-				margin: 8
+				margin: 8,
 			});
 		} catch (e) {
-			console.warn('Barcode render failed:', e);
+			console.warn("Barcode render failed:", e);
 		}
 	}
 
-	// Auto-render preview whenever barcode value changes
 	$: if (showModal && form.barcode) {
 		renderBarcodePreview(form.barcode);
 	}
@@ -223,18 +317,28 @@
 	function closeBarcodeModal() {
 		selectedProduct = null;
 	}
-	function handleGlobalKeydown(e: any) {
-		if (e.key === 'Escape' && selectedProduct) {
+
+	function handleGlobalKeydown(e: KeyboardEvent) {
+		if (e.key === "Escape" && selectedProduct) {
 			closeBarcodeModal();
 		}
 	}
+
 	function copyBarcode() {
-		navigator.clipboard.writeText(selectedProduct.barcode);
+		if (selectedProduct) {
+			navigator.clipboard.writeText(selectedProduct.barcode);
+		}
 	}
 
-	// Calculate total inventory cost
-	$: totalInventoryCost = displayedProducts.reduce((sum, p) => sum + p.cost * p.quantity, 0);
-	$: totalInventoryValue = displayedProducts.reduce((sum, p) => sum + p.price * p.quantity, 0);
+	// --- SUMMARY CALCULATIONS (based on ALL filtered results, not just the visible page) ---
+	$: totalInventoryCost = displayedProducts.reduce(
+		(sum, p) => sum + p.cost * p.quantity,
+		0,
+	);
+	$: totalInventoryValue = displayedProducts.reduce(
+		(sum, p) => sum + p.price * p.quantity,
+		0,
+	);
 	$: totalProfit = totalInventoryValue - totalInventoryCost;
 </script>
 
@@ -246,7 +350,9 @@
 		<p class="subtitle">
 			JJGapo Product Management
 			<span
-				class="pulse-dot {realtimeStatus === 'SUBSCRIBED' ? 'green' : 'red'}"
+				class="pulse-dot {realtimeStatus === 'SUBSCRIBED'
+					? 'green'
+					: 'red'}"
 				title={realtimeStatus}
 			></span>
 		</p>
@@ -266,7 +372,11 @@
 				stroke-width="2"
 				stroke-linecap="round"
 				stroke-linejoin="round"
-				><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"
+				><circle cx="11" cy="11" r="8"></circle><line
+					x1="21"
+					y1="21"
+					x2="16.65"
+					y2="16.65"
 				></line></svg
 			>
 			<input
@@ -277,10 +387,110 @@
 			/>
 		</div>
 
-		<select class="minimal-select" bind:value={selectedCategoryFilter}>
-			<option value="">All Categories</option>
-			{#each categoriesList as cat}<option value={cat.id}>{cat.name}</option>{/each}
-		</select>
+		<!-- CATEGORY CUSTOM DROPDOWN -->
+		<div class="custom-select-box">
+			<button
+				type="button"
+				class="minimal-select-trigger"
+				on:click={toggleCategoryDropdown}
+			>
+				<span>{selectedCategoryName}</span>
+				<svg
+					width="12"
+					height="12"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					class:rotated={categoryDropdownOpen}
+				>
+					<polyline points="6 9 12 15 18 9"></polyline>
+				</svg>
+			</button>
+
+			{#if categoryDropdownOpen}
+				<div
+					class="dropdown-backdrop"
+					role="presentation"
+					on:click={closeDropdowns}
+				></div>
+				<div class="dropdown-list">
+					<button
+						type="button"
+						class="dropdown-option"
+						class:active={selectedCategoryFilter === ""}
+						on:click={() => selectCategory("")}
+					>
+						All Categories
+					</button>
+					{#each categoriesList as cat}
+						<button
+							type="button"
+							class="dropdown-option"
+							class:active={String(selectedCategoryFilter) ===
+								String(cat.id)}
+							on:click={() => selectCategory(String(cat.id))}
+						>
+							{cat.name}
+						</button>
+					{/each}
+				</div>
+			{/if}
+		</div>
+
+		<!-- BRAND CUSTOM DROPDOWN -->
+		<div class="custom-select-box">
+			<button
+				type="button"
+				class="minimal-select-trigger"
+				on:click={toggleBrandDropdown}
+			>
+				<span>{selectedBrandName}</span>
+				<svg
+					width="12"
+					height="12"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					class:rotated={brandDropdownOpen}
+				>
+					<polyline points="6 9 12 15 18 9"></polyline>
+				</svg>
+			</button>
+
+			{#if brandDropdownOpen}
+				<div
+					class="dropdown-backdrop"
+					role="presentation"
+					on:click={closeDropdowns}
+				></div>
+				<div class="dropdown-list">
+					<button
+						type="button"
+						class="dropdown-option"
+						class:active={selectedBrandFilter === ""}
+						on:click={() => selectBrand("")}
+					>
+						All Brands
+					</button>
+					{#each brandSuggestions as brand}
+						<button
+							type="button"
+							class="dropdown-option"
+							class:active={selectedBrandFilter === brand}
+							on:click={() => selectBrand(brand)}
+						>
+							{brand}
+						</button>
+					{/each}
+				</div>
+			{/if}
+		</div>
 	</div>
 </div>
 
@@ -288,21 +498,27 @@
 	<div class="summary-card">
 		<div class="summary-label">Total Inventory Cost</div>
 		<div class="summary-value">
-			₱{totalInventoryCost.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+			₱{totalInventoryCost.toLocaleString(undefined, {
+				minimumFractionDigits: 2,
+			})}
 		</div>
 		<div class="summary-subtext">{displayedProducts.length} products</div>
 	</div>
 	<div class="summary-card">
 		<div class="summary-label">Total Inventory Value</div>
 		<div class="summary-value sale">
-			₱{totalInventoryValue.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+			₱{totalInventoryValue.toLocaleString(undefined, {
+				minimumFractionDigits: 2,
+			})}
 		</div>
 		<div class="summary-subtext">at current prices</div>
 	</div>
 	<div class="summary-card">
 		<div class="summary-label">Total Profit Potential</div>
 		<div class="summary-value profit">
-			₱{totalProfit.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+			₱{totalProfit.toLocaleString(undefined, {
+				minimumFractionDigits: 2,
+			})}
 		</div>
 		<div class="summary-subtext">
 			{((totalProfit / totalInventoryCost) * 100).toFixed(1)}% margin
@@ -310,83 +526,121 @@
 	</div>
 </div>
 
-<div class="table-container">
-	{#if loading || displayedProducts.length > 0}
+<div
+	class="table-container"
+	bind:this={tableContainerEl}
+>
+	{#if loading || pagedProducts.length > 0}
 		<table>
 			<thead>
 				<tr>
 					<th
-						on:click={() => toggleSort('name')}
-						on:keydown={(e) => e.key === 'Enter' && toggleSort('name')}
+						on:click={() => toggleSort("name")}
+						on:keydown={(e) =>
+							e.key === "Enter" && toggleSort("name")}
 						role="columnheader"
 						tabindex="0"
-						aria-sort={sortField === 'name'
+						aria-sort={sortField === "name"
 							? sortDirection === -1
-								? 'descending'
-								: 'ascending'
-							: 'none'}
-						class="sortable {sortField === 'name' ? 'active-column' : ''}"
+								? "descending"
+								: "ascending"
+							: "none"}
+						class="sortable {sortField === 'name'
+							? 'active-column'
+							: ''}"
 					>
-						Product/Brand {sortField === 'name' ? (sortDirection === -1 ? '▼' : '▲') : '↕'}
+						Product/Brand {sortField === "name"
+							? sortDirection === -1
+								? "▼"
+								: "▲"
+							: "↕"}
 					</th>
 					<th>Color</th>
 					<th
-						on:click={() => toggleSort('categoryId')}
-						on:keydown={(e) => e.key === 'Enter' && toggleSort('categoryId')}
+						on:click={() => toggleSort("categoryId")}
+						on:keydown={(e) =>
+							e.key === "Enter" && toggleSort("categoryId")}
 						role="columnheader"
 						tabindex="0"
-						aria-sort={sortField === 'categoryId'
+						aria-sort={sortField === "categoryId"
 							? sortDirection === -1
-								? 'descending'
-								: 'ascending'
-							: 'none'}
-						class="sortable {sortField === 'categoryId' ? 'active-column' : ''}"
+								? "descending"
+								: "ascending"
+							: "none"}
+						class="sortable {sortField === 'categoryId'
+							? 'active-column'
+							: ''}"
 					>
-						Category {sortField === 'categoryId' ? (sortDirection === -1 ? '▼' : '▲') : '↕'}
+						Category {sortField === "categoryId"
+							? sortDirection === -1
+								? "▼"
+								: "▲"
+							: "↕"}
 					</th>
 					<th>Size</th>
 					<th
-						on:click={() => toggleSort('cost')}
-						on:keydown={(e) => e.key === 'Enter' && toggleSort('cost')}
+						on:click={() => toggleSort("cost")}
+						on:keydown={(e) =>
+							e.key === "Enter" && toggleSort("cost")}
 						role="columnheader"
 						tabindex="0"
-						aria-sort={sortField === 'cost'
+						aria-sort={sortField === "cost"
 							? sortDirection === -1
-								? 'descending'
-								: 'ascending'
-							: 'none'}
-						class="sortable {sortField === 'cost' ? 'active-column' : ''}"
+								? "descending"
+								: "ascending"
+							: "none"}
+						class="sortable {sortField === 'cost'
+							? 'active-column'
+							: ''}"
 					>
-						Unit Price {sortField === 'cost' ? (sortDirection === -1 ? '▼' : '▲') : '↕'}
+						Unit Price {sortField === "cost"
+							? sortDirection === -1
+								? "▼"
+								: "▲"
+							: "↕"}
 					</th>
 					<th
-						on:click={() => toggleSort('price')}
-						on:keydown={(e) => e.key === 'Enter' && toggleSort('price')}
+						on:click={() => toggleSort("price")}
+						on:keydown={(e) =>
+							e.key === "Enter" && toggleSort("price")}
 						role="columnheader"
 						tabindex="0"
-						aria-sort={sortField === 'price'
+						aria-sort={sortField === "price"
 							? sortDirection === -1
-								? 'descending'
-								: 'ascending'
-							: 'none'}
-						class="sortable {sortField === 'price' ? 'active-column' : ''}"
+								? "descending"
+								: "ascending"
+							: "none"}
+						class="sortable {sortField === 'price'
+							? 'active-column'
+							: ''}"
 					>
-						SRP {sortField === 'price' ? (sortDirection === -1 ? '▼' : '▲') : '↕'}
+						SRP {sortField === "price"
+							? sortDirection === -1
+								? "▼"
+								: "▲"
+							: "↕"}
 					</th>
 					<th>Barcode</th>
 					<th
-						on:click={() => toggleSort('quantity')}
-						on:keydown={(e) => e.key === 'Enter' && toggleSort('quantity')}
+						on:click={() => toggleSort("quantity")}
+						on:keydown={(e) =>
+							e.key === "Enter" && toggleSort("quantity")}
 						role="columnheader"
 						tabindex="0"
-						aria-sort={sortField === 'quantity'
+						aria-sort={sortField === "quantity"
 							? sortDirection === -1
-								? 'descending'
-								: 'ascending'
-							: 'none'}
-						class="sortable {sortField === 'quantity' ? 'active-column' : ''}"
+								? "descending"
+								: "ascending"
+							: "none"}
+						class="sortable {sortField === 'quantity'
+							? 'active-column'
+							: ''}"
 					>
-						Quantity {sortField === 'quantity' ? (sortDirection === -1 ? '▼' : '▲') : '↕'}
+						Quantity {sortField === "quantity"
+							? sortDirection === -1
+								? "▼"
+								: "▲"
+							: "↕"}
 					</th>
 				</tr>
 			</thead>
@@ -395,12 +649,14 @@
 					{#each Array(8) as _}
 						<tr class="skeleton-row">
 							{#each Array(8) as __}
-								<td data-label=""><div class="skeleton-bar"></div></td>
+								<td data-label=""
+									><div class="skeleton-bar"></div></td
+								>
 							{/each}
 						</tr>
 					{/each}
 				{:else}
-					{#each displayedProducts as p}
+					{#each pagedProducts as p (p.id)}
 						<tr transition:fade>
 							<td data-label="Product">
 								<div class="p-name">{p.name}</div>
@@ -414,7 +670,10 @@
 							<td data-label="Color">
 								<div class="color-indicator">
 									{#if p.color}
-										<span class="dot" style="background-color: {p.color};"></span>
+										<span
+											class="dot"
+											style="background-color: {p.color};"
+										></span>
 										<span class="text-dim">{p.color}</span>
 									{:else}
 										<span class="text-dim">—</span>
@@ -423,32 +682,55 @@
 							</td>
 							<td data-label="Category">
 								<span class="text-dim">
-									{categoriesList.find((cat) => cat.id === p.categoryId)?.name || 'Uncategorized'}
+									{categoriesList.find(
+										(cat) => cat.id === p.categoryId,
+									)?.name || "Uncategorized"}
 								</span>
 							</td>
-							<td data-label="Size"><span class="text-dim">{p.size || '—'}</span></td>
+							<td data-label="Size"
+								><span class="text-dim">{p.size || "—"}</span
+								></td
+							>
 							<td data-label="Cost">
 								<span class="cost-text"
-									>₱{p.cost.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span
+									>₱{p.cost.toLocaleString(undefined, {
+										minimumFractionDigits: 2,
+									})}</span
 								>
 							</td>
 							<td data-label="Price">
 								<span class="price-text"
-									>₱{p.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span
+									>₱{p.price.toLocaleString(undefined, {
+										minimumFractionDigits: 2,
+									})}</span
 								>
 							</td>
-							<td data-label="Barcode" >
-								<button type="button" class="barcode-btn" on:click={() => openBarcode(p)}>
+							<td data-label="Barcode">
+								<button
+									type="button"
+									class="barcode-btn"
+									on:click={() => openBarcode(p)}
+								>
 									{p.barcode}
 								</button>
 							</td>
 							<td data-label="Quantity">
-								<span class="qty-text" class:low={p.quantity < 5}>
+								<span
+									class="qty-text"
+									class:low={p.quantity < 5}
+								>
 									{p.quantity} <small>pcs</small>
 								</span>
 							</td>
 						</tr>
 					{/each}
+					{#if hasMore}
+						<tr class="loading-more-row">
+							<td colspan="8">
+								<div class="loading-more">Loading more…</div>
+							</td>
+						</tr>
+					{/if}
 				{/if}
 			</tbody>
 		</table>
@@ -458,39 +740,56 @@
 			<h2>No products found</h2>
 			<p>
 				{#if searchQuery || selectedCategoryFilter}
-					No products match your current filters. Try clearing your search.
+					No products match your current filters. Try clearing your
+					search.
 				{:else}
-					Your inventory is currently empty. Start by adding your first product.
+					Your inventory is currently empty. Start by adding your
+					first product.
 				{/if}
 			</p>
 		</div>
 	{/if}
 </div>
-{#if selectedProduct}
-	<div class="modal-backdrop" on:click={closeBarcodeModal} role="presentation">
-		<section
-			class="modal-card"
-			role="dialog"
-			aria-modal="true"
-			tabindex="-1"
-			on:click|stopPropagation
-			on:keydown|stopPropagation
-		>
-			<div class="modal-header">
-				<div class="modal-title">{selectedProduct.name}</div>
-				<button type="button" class="btn-close" on:click={closeBarcodeModal} aria-label="Close">
-					✕
-				</button>
-			</div>
 
-			<div class="barcode-box">
-				<svg bind:this={barcodeSvg}></svg>
-				<div class="barcode-number">
-					{selectedProduct.barcode}
-				</div>
+{#if selectedProduct}
+<div
+	class="modal-backdrop"
+	on:click={closeBarcodeModal}
+	role="presentation"
+>
+	<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+	<!-- svelte-ignore a11y-click-events-have-key-events -->
+	<div
+		class="modal-card"
+		role="dialog"
+		aria-modal="true"
+		aria-labelledby="barcode-modal-title"
+		tabindex="-1"
+		on:click|stopPropagation
+		on:keydown|stopPropagation
+	>
+		<div class="modal-header">
+			<div class="modal-title" id="barcode-modal-title">
+				{selectedProduct.name}
 			</div>
-		</section>
+			<button
+				type="button"
+				class="btn-close"
+				on:click={closeBarcodeModal}
+				aria-label="Close"
+			>
+				✕
+			</button>
+		</div>
+
+		<div class="barcode-box">
+			<svg bind:this={barcodeSvg}></svg>
+			<div class="barcode-number">
+				{selectedProduct.barcode}
+			</div>
+		</div>
 	</div>
+</div>
 {/if}
 
 {#if toast.show}
@@ -657,14 +956,19 @@
 		width: 220px;
 	}
 
-	.minimal-select {
-		border: 1px solid #e2e8f0;
-		padding: 8px 12px;
-		border-radius: 6px;
-		font-size: 0.85rem;
-		outline: none;
-		background: white;
+	/* --- LOADING MORE ROW --- */
+	.loading-more-row td {
+		background: #f8fafc !important;
+		text-align: center;
+		padding: 14px !important;
 	}
+	.loading-more {
+		font-size: 0.8rem;
+		color: #94a3b8;
+		font-weight: 600;
+	}
+
+	/* --- FLOATING FILTER BUTTON --- */
 
 	.table-container {
 		background: white;
@@ -809,7 +1113,7 @@
 
 	/* Optional: Subtle animation for the sort arrow */
 	th.sortable:hover::after {
-		content: ' (Sort)';
+		content: " (Sort)";
 		font-size: 0.6rem;
 		position: absolute;
 		bottom: -15px;
@@ -979,7 +1283,6 @@
 		border-radius: 2px;
 	}
 
-
 	.btn-close:hover {
 		background: #e2e8f0;
 		color: #1e293b;
@@ -999,7 +1302,12 @@
 	.skeleton-bar {
 		height: 12px;
 		background: #e2e8f0;
-		background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+		background: linear-gradient(
+			90deg,
+			#f1f5f9 25%,
+			#e2e8f0 50%,
+			#f1f5f9 75%
+		);
 		background-size: 200% 100%;
 		animation: skeleton-shimmer 1.5s infinite linear;
 		border-radius: 4px;
@@ -1080,11 +1388,6 @@
 		.minimal-input {
 			width: 150px;
 			font-size: 0.85rem;
-		}
-
-		.minimal-select {
-			font-size: 0.85rem;
-			padding: 8px 12px;
 		}
 
 		.modal-card {
@@ -1211,10 +1514,6 @@
 			min-width: 200px;
 		}
 
-		.minimal-select {
-			flex: 1;
-			min-width: 150px;
-		}
 		.modal-card {
 			width: 90%;
 			max-width: 450px;
@@ -1228,10 +1527,6 @@
 	@media (max-width: 768px) {
 		.main-title {
 			font-size: 1.25rem;
-		}
-
-		.minimal-select {
-			width: auto;
 		}
 
 		.summary-card {
@@ -1292,7 +1587,6 @@
 			margin-right: 8px;
 		}
 
-
 		tr:hover td {
 			background-color: transparent;
 		}
@@ -1303,6 +1597,23 @@
 			max-height: 90vh;
 			overflow-y: auto;
 			padding: 1rem;
+		}
+		.loading-more-row {
+			border: none !important;
+			box-shadow: none !important;
+			margin-bottom: 0 !important;
+			background: transparent !important;
+		}
+
+		.loading-more-row td {
+			display: block !important;
+			text-align: center !important;
+			padding: 14px 0 !important;
+			border-bottom: none !important;
+		}
+
+		.loading-more-row td::before {
+			content: none !important;
 		}
 	}
 
@@ -1371,6 +1682,101 @@
 		/* Ensure Product/Brand stack is correct */
 		td:first-child {
 			text-align: left;
+		}
+	}
+	.custom-select-box {
+		position: relative;
+	}
+
+	.minimal-select-trigger {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 8px;
+		border: 1px solid #e2e8f0;
+		padding: 8px 12px;
+		border-radius: 6px;
+		font-size: 0.85rem;
+		background: white;
+		color: #0f172a;
+		cursor: pointer;
+		font-family: inherit;
+		min-width: 140px;
+	}
+
+	.minimal-select-trigger:hover {
+		border-color: #cbd5e1;
+	}
+
+	.minimal-select-trigger svg {
+		flex-shrink: 0;
+		color: #64748b;
+		transition: transform 0.15s ease;
+	}
+
+	.minimal-select-trigger svg.rotated {
+		transform: rotate(180deg);
+	}
+
+	.dropdown-backdrop {
+		position: fixed;
+		inset: 0;
+		z-index: 150;
+	}
+
+	.dropdown-list {
+		position: absolute;
+		top: calc(100% + 4px);
+		left: 0;
+		right: 0;
+		width: auto;
+		max-height: 260px;
+		overflow-y: auto;
+		background: white;
+		border: 1px solid #e2e8f0;
+		border-radius: 10px;
+		box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15);
+		z-index: 151;
+		padding: 6px;
+		box-sizing: border-box;
+	}
+
+	.dropdown-option {
+		display: block;
+		width: 100%;
+		text-align: left;
+		background: none;
+		border: none;
+		padding: 9px 10px;
+		font-family: inherit;
+		font-size: 0.82rem;
+		color: #0f172a;
+		border-radius: 6px;
+		cursor: pointer;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.dropdown-option:hover {
+		background: #f1f5f9;
+	}
+
+	.dropdown-option.active {
+		background: #eff6ff;
+		color: #0014c5;
+		font-weight: 700;
+	}
+
+	@media (max-width: 480px) {
+		.dropdown-list {
+			max-width: 90vw;
+			left: -20px;
+		}
+		.minimal-select-trigger {
+			min-width: 110px;
+			font-size: 0.78rem;
+			padding: 7px 10px;
 		}
 	}
 </style>

@@ -1,0 +1,655 @@
+[DB][2026-05-10T07:58:26.309Z] Running backend server entry
+[DB][2026-05-10T07:58:26.312Z] NODE_ENV:development
+[DB][2026-05-10T07:58:26.314Z] isElectron:false
+[DB][2026-05-10T07:58:26.315Z] isMainProcess:false
+[DB][2026-05-10T07:58:26.316Z] index.ts starting — loading environment...
+[DB][2026-05-10T07:58:26.330Z] Environment loaded.
+[DB][2026-05-10T07:58:26.335Z] DATABASE_URL set:false
+[DB][2026-05-10T11:31:31.194Z] Running backend server entry
+[DB][2026-05-10T11:31:31.205Z] NODE_ENV:development
+[DB][2026-05-10T11:31:31.207Z] isElectron:false
+[DB][2026-05-10T11:31:31.215Z] isMainProcess:false
+[DB][2026-05-10T11:31:31.227Z] index.ts starting — loading environment...
+[DB][2026-05-10T11:31:31.234Z] Environment loaded.
+[DB][2026-05-10T11:31:31.238Z] DATABASE_URL set:true
+[DB][2026-05-10T11:31:31.239Z] DATABASE_URL preview:postgresql://[REDACTED]
+[DB][2026-05-10T11:31:31.242Z] Connecting to host:db.zubzmhcqnwbkquqsagbq.supabase.co:5432
+[DB][2026-05-10T11:31:31.244Z] Database:postgres
+[DB][2026-05-10T11:31:31.246Z] User:postgres
+[DB][2026-05-10T11:31:31.250Z] Starting database [REDACTED]...
+[DB][2026-05-10T11:31:31.255Z] Verifying Supabase connection...
+[DB][2026-05-10T11:31:31.265Z] index.ts module loaded — DB init running in background...
+[DB][2026-05-10T11:31:33.198Z] Supabase connection verified ✅
+[DB][2026-05-10T11:31:33.274Z] database [REDACTED] complete.
+[DB][2026-05-10T11:31:33.280Z] Postgres connection pool created.
+[DB][2026-05-10T11:31:33.288Z] Drizzle ORM instance created.
+[DB][2026-05-10T11:31:33.303Z] DB fully ready ✅
+[DB][2026-05-10T11:32:59.040Z] Running backend server entry
+[DB][2026-05-10T11:32:59.139Z] NODE_ENV:development
+[DB][2026-05-10T11:32:59.157Z] index.ts starting — loading environment...
+[DB][2026-05-10T11:32:59.241Z] Environment loaded.
+[DB][2026-05-10T11:32:59.278Z] DATABASE_URL set:true
+[DB][2026-05-10T11:32:59.303Z] DATABASE_URL preview:postgresql://[REDACTED]
+[DB][2026-05-10T11:32:59.341Z] Connecting to host:db.zubzmhcqnwbkquqsagbq.supabase.co:5432
+[DB][2026-05-10T11:32:59.355Z] Database:postgres
+[DB][2026-05-10T11:32:59.393Z] User:postgres
+[DB][2026-05-10T11:32:59.405Z] Starting database [REDACTED]...
+[DB][2026-05-10T11:32:59.444Z] Verifying Supabase connection...
+[DB][2026-05-10T11:32:59.495Z] index.ts module loaded — DB init running in background...
+[DB][2026-05-10T11:33:01.108Z] Supabase connection verified ✅
+[DB][2026-05-10T11:33:01.177Z] database [REDACTED] complete.
+[DB][2026-05-10T11:33:01.181Z] Postgres connection pool created.
+[DB][2026-05-10T11:33:01.188Z] Drizzle ORM instance created.
+[DB][2026-05-10T11:33:01.276Z] DB fully ready ✅
+[DB][2026-05-10T11:33:05.571Z] Running backend server entry
+[DB][2026-05-10T11:33:05.611Z] NODE_ENV:development
+[DB][2026-05-10T11:33:05.662Z] index.ts starting — loading environment...
+[DB][2026-05-10T11:33:05.726Z] Environment loaded.
+[DB][2026-05-10T11:33:05.817Z] DATABASE_URL set:true
+[DB][2026-05-10T11:33:05.894Z] DATABASE_URL preview:postgresql://[REDACTED]
+[DB][2026-05-10T11:33:05.927Z] Connecting to host:db.zubzmhcqnwbkquqsagbq.supabase.co:5432
+[DB][2026-05-10T11:33:05.944Z] Database:postgres
+[DB][2026-05-10T11:33:05.960Z] User:postgres
+[DB][2026-05-10T11:33:05.977Z] Starting database [REDACTED]...
+[DB][2026-05-10T11:33:06.026Z] Verifying Supabase connection...
+[DB][2026-05-10T11:33:06.037Z] index.ts module loaded — DB init running in background...
+[DB][2026-05-10T11:33:06.425Z] Supabase connection verified ✅
+[DB][2026-05-10T11:33:06.435Z] database [REDACTED] complete.
+[DB][2026-05-10T11:33:06.437Z] Postgres connection pool created.
+[DB][2026-05-10T11:33:06.448Z] Drizzle ORM instance created.
+[DB][2026-05-10T11:33:06.453Z] DB fully ready ✅
+[DB][2026-05-10T11:33:10.972Z] Running backend server entry
+[DB][2026-05-10T11:33:10.988Z] NODE_ENV:development
+[DB][2026-05-10T11:33:10.991Z] index.ts starting — loading environment...
+[DB][2026-05-10T11:33:10.994Z] Environment loaded.
+[DB][2026-05-10T11:33:10.998Z] DATABASE_URL set:true
+[DB][2026-05-10T11:33:11.001Z] DATABASE_URL preview:postgresql://[REDACTED]
+[DB][2026-05-10T11:33:11.004Z] Connecting to host:db.zubzmhcqnwbkquqsagbq.supabase.co:5432
+[DB][2026-05-10T11:33:11.007Z] Database:postgres
+[DB][2026-05-10T11:33:11.011Z] User:postgres
+[DB][2026-05-10T11:33:11.016Z] Starting database [REDACTED]...
+[DB][2026-05-10T11:33:11.020Z] Verifying Supabase connection...
+[DB][2026-05-10T11:33:11.025Z] index.ts module loaded — DB init running in background...
+[DB][2026-05-10T11:33:11.395Z] Supabase connection verified ✅
+[DB][2026-05-10T11:33:11.410Z] database [REDACTED] complete.
+[DB][2026-05-10T11:33:11.428Z] Postgres connection pool created.
+[DB][2026-05-10T11:33:11.463Z] Drizzle ORM instance created.
+[DB][2026-05-10T11:33:11.481Z] DB fully ready ✅
+[DB][2026-05-10T11:33:16.940Z] Running backend server entry
+[DB][2026-05-10T11:33:16.950Z] NODE_ENV:development
+[DB][2026-05-10T11:33:16.959Z] index.ts starting — loading environment...
+[DB][2026-05-10T11:33:16.961Z] Environment loaded.
+[DB][2026-05-10T11:33:16.972Z] DATABASE_URL set:true
+[DB][2026-05-10T11:33:16.975Z] DATABASE_URL preview:postgresql://[REDACTED]
+[DB][2026-05-10T11:33:16.976Z] Connecting to host:db.zubzmhcqnwbkquqsagbq.supabase.co:5432
+[DB][2026-05-10T11:33:16.978Z] Database:postgres
+[DB][2026-05-10T11:33:16.987Z] User:postgres
+[DB][2026-05-10T11:33:16.991Z] Starting database [REDACTED]...
+[DB][2026-05-10T11:33:16.993Z] Verifying Supabase connection...
+[DB][2026-05-10T11:33:17.004Z] index.ts module loaded — DB init running in background...
+[DB][2026-05-10T11:33:17.356Z] Supabase connection verified ✅
+[DB][2026-05-10T11:33:17.360Z] database [REDACTED] complete.
+[DB][2026-05-10T11:33:17.363Z] Postgres connection pool created.
+[DB][2026-05-10T11:33:17.372Z] Drizzle ORM instance created.
+[DB][2026-05-10T11:33:17.375Z] DB fully ready ✅
+[DB][2026-05-10T11:33:24.926Z] Running backend server entry
+[DB][2026-05-10T11:33:24.931Z] NODE_ENV:development
+[DB][2026-05-10T11:33:24.940Z] index.ts starting — loading environment...
+[DB][2026-05-10T11:33:24.945Z] Environment loaded.
+[DB][2026-05-10T11:33:24.947Z] DATABASE_URL set:true
+[DB][2026-05-10T11:33:24.957Z] DATABASE_URL preview:postgresql://[REDACTED]
+[DB][2026-05-10T11:33:24.960Z] Connecting to host:db.zubzmhcqnwbkquqsagbq.supabase.co:5432
+[DB][2026-05-10T11:33:24.963Z] Database:postgres
+[DB][2026-05-10T11:33:24.974Z] User:postgres
+[DB][2026-05-10T11:33:24.977Z] Starting database [REDACTED]...
+[DB][2026-05-10T11:33:24.980Z] Verifying Supabase connection...
+[DB][2026-05-10T11:33:24.990Z] index.ts module loaded — DB init running in background...
+[DB][2026-05-10T11:33:25.320Z] Supabase connection verified ✅
+[DB][2026-05-10T11:33:25.326Z] database [REDACTED] complete.
+[DB][2026-05-10T11:33:25.336Z] Postgres connection pool created.
+[DB][2026-05-10T11:33:25.341Z] Drizzle ORM instance created.
+[DB][2026-05-10T11:33:25.348Z] DB fully ready ✅
+[DB][2026-05-10T11:33:30.883Z] Running backend server entry
+[DB][2026-05-10T11:33:30.890Z] NODE_ENV:development
+[DB][2026-05-10T11:33:30.904Z] index.ts starting — loading environment...
+[DB][2026-05-10T11:33:30.920Z] Environment loaded.
+[DB][2026-05-10T11:33:30.923Z] DATABASE_URL set:true
+[DB][2026-05-10T11:33:30.930Z] DATABASE_URL preview:postgresql://[REDACTED]
+[DB][2026-05-10T11:33:30.940Z] Connecting to host:db.zubzmhcqnwbkquqsagbq.supabase.co:5432
+[DB][2026-05-10T11:33:30.944Z] Database:postgres
+[DB][2026-05-10T11:33:30.955Z] User:postgres
+[DB][2026-05-10T11:33:30.957Z] Starting database [REDACTED]...
+[DB][2026-05-10T11:33:30.958Z] Verifying Supabase connection...
+[DB][2026-05-10T11:33:30.970Z] index.ts module loaded — DB init running in background...
+[DB][2026-05-10T11:33:31.351Z] Supabase connection verified ✅
+[DB][2026-05-10T11:33:31.366Z] database [REDACTED] complete.
+[DB][2026-05-10T11:33:31.371Z] Postgres connection pool created.
+[DB][2026-05-10T11:33:31.378Z] Drizzle ORM instance created.
+[DB][2026-05-10T11:33:31.381Z] DB fully ready ✅
+[DB][2026-05-10T11:33:38.477Z] Running backend server entry
+[DB][2026-05-10T11:33:38.487Z] NODE_ENV:development
+[DB][2026-05-10T11:33:38.490Z] index.ts starting — loading environment...
+[DB][2026-05-10T11:33:38.504Z] Environment loaded.
+[DB][2026-05-10T11:33:38.513Z] DATABASE_URL set:true
+[DB][2026-05-10T11:33:38.521Z] DATABASE_URL preview:postgresql://[REDACTED]
+[DB][2026-05-10T11:33:38.523Z] Connecting to host:db.zubzmhcqnwbkquqsagbq.supabase.co:5432
+[DB][2026-05-10T11:33:38.527Z] Database:postgres
+[DB][2026-05-10T11:33:38.530Z] User:postgres
+[DB][2026-05-10T11:33:38.533Z] Starting database [REDACTED]...
+[DB][2026-05-10T11:33:38.540Z] Verifying Supabase connection...
+[DB][2026-05-10T11:33:38.562Z] index.ts module loaded — DB init running in background...
+[DB][2026-05-10T11:33:38.954Z] Supabase connection verified ✅
+[DB][2026-05-10T11:33:38.961Z] database [REDACTED] complete.
+[DB][2026-05-10T11:33:38.964Z] Postgres connection pool created.
+[DB][2026-05-10T11:33:38.977Z] Drizzle ORM instance created.
+[DB][2026-05-10T11:33:38.991Z] DB fully ready ✅
+[DB][2026-05-10T11:33:44.911Z] Running backend server entry
+[DB][2026-05-10T11:33:44.916Z] NODE_ENV:development
+[DB][2026-05-10T11:33:44.928Z] index.ts starting — loading environment...
+[DB][2026-05-10T11:33:44.940Z] Environment loaded.
+[DB][2026-05-10T11:33:44.941Z] DATABASE_URL set:true
+[DB][2026-05-10T11:33:44.942Z] DATABASE_URL preview:postgresql://[REDACTED]
+[DB][2026-05-10T11:33:44.943Z] Connecting to host:db.zubzmhcqnwbkquqsagbq.supabase.co:5432
+[DB][2026-05-10T11:33:44.944Z] Database:postgres
+[DB][2026-05-10T11:33:44.945Z] User:postgres
+[DB][2026-05-10T11:33:44.946Z] Starting database [REDACTED]...
+[DB][2026-05-10T11:33:44.948Z] Verifying Supabase connection...
+[DB][2026-05-10T11:33:44.959Z] index.ts module loaded — DB init running in background...
+[DB][2026-05-10T11:33:45.372Z] Supabase connection verified ✅
+[DB][2026-05-10T11:33:45.380Z] database [REDACTED] complete.
+[DB][2026-05-10T11:33:45.406Z] Postgres connection pool created.
+[DB][2026-05-10T11:33:45.415Z] Drizzle ORM instance created.
+[DB][2026-05-10T11:33:45.431Z] DB fully ready ✅
+[DB][2026-05-10T11:35:14.213Z] Running backend server entry
+[DB][2026-05-10T11:35:14.228Z] NODE_ENV:development
+[DB][2026-05-10T11:35:14.236Z] index.ts starting — loading environment...
+[DB][2026-05-10T11:35:14.305Z] Environment loaded.
+[DB][2026-05-10T11:35:14.343Z] DATABASE_URL set:true
+[DB][2026-05-10T11:35:14.384Z] DATABASE_URL preview:postgresql://[REDACTED]
+[DB][2026-05-10T11:35:14.413Z] Connecting to host:db.zubzmhcqnwbkquqsagbq.supabase.co:5432
+[DB][2026-05-10T11:35:14.446Z] Database:postgres
+[DB][2026-05-10T11:35:14.463Z] User:postgres
+[DB][2026-05-10T11:35:14.488Z] Starting database [REDACTED]...
+[DB][2026-05-10T11:35:14.533Z] Verifying Supabase connection...
+[DB][2026-05-10T11:35:14.646Z] index.ts module loaded — DB init running in background...
+[DB][2026-05-10T11:35:16.479Z] Supabase connection verified ✅
+[DB][2026-05-10T11:35:16.546Z] database [REDACTED] complete.
+[DB][2026-05-10T11:35:16.567Z] Postgres connection pool created.
+[DB][2026-05-10T11:35:16.595Z] Drizzle ORM instance created.
+[DB][2026-05-10T11:35:16.602Z] DB fully ready ✅
+[DB][2026-05-10T11:39:06.399Z] Running backend server entry
+[DB][2026-05-10T11:39:06.512Z] NODE_ENV:development
+[DB][2026-05-10T11:39:06.577Z] index.ts starting — loading environment...
+[DB][2026-05-10T11:39:06.893Z] Environment loaded.
+[DB][2026-05-10T11:39:06.981Z] DATABASE_URL set:true
+[DB][2026-05-10T11:39:07.067Z] DATABASE_URL preview:postgresql://[REDACTED]
+[DB][2026-05-10T11:39:07.192Z] Connecting to host:db.zubzmhcqnwbkquqsagbq.supabase.co:5432
+[DB][2026-05-10T11:39:07.342Z] Database:postgres
+[DB][2026-05-10T11:39:07.395Z] User:postgres
+[DB][2026-05-10T11:39:07.448Z] Starting database [REDACTED]...
+[DB][2026-05-10T11:39:07.509Z] Verifying Supabase connection...
+[DB][2026-05-10T11:39:07.556Z] index.ts module loaded — DB init running in background...
+[DB][2026-05-10T11:39:08.829Z] Supabase connection verified ✅
+[DB][2026-05-10T11:39:08.861Z] database [REDACTED] complete.
+[DB][2026-05-10T11:39:08.863Z] Postgres connection pool created.
+[DB][2026-05-10T11:39:08.883Z] Drizzle ORM instance created.
+[DB][2026-05-10T11:39:08.890Z] DB fully ready ✅
+[DB][2026-05-10T11:41:10.974Z] Running backend server entry
+[DB][2026-05-10T11:41:10.976Z] NODE_ENV:development
+[DB][2026-05-10T11:41:10.979Z] index.ts starting — loading environment...
+[DB][2026-05-10T11:41:10.997Z] Environment loaded.
+[DB][2026-05-10T11:41:10.998Z] DATABASE_URL set:true
+[DB][2026-05-10T11:41:11.004Z] DATABASE_URL preview:postgresql://[REDACTED]
+[DB][2026-05-10T11:41:11.007Z] Connecting to host:db.zubzmhcqnwbkquqsagbq.supabase.co:5432
+[DB][2026-05-10T11:41:11.010Z] Database:postgres
+[DB][2026-05-10T11:41:11.011Z] User:postgres
+[DB][2026-05-10T11:41:11.014Z] Starting database [REDACTED]...
+[DB][2026-05-10T11:41:11.019Z] Verifying Supabase connection...
+[DB][2026-05-10T11:41:11.023Z] index.ts module loaded — DB init running in background...
+[DB][2026-05-10T11:41:11.532Z] Supabase connection verified ✅
+[DB][2026-05-10T11:41:11.541Z] database [REDACTED] complete.
+[DB][2026-05-10T11:41:11.543Z] Postgres connection pool created.
+[DB][2026-05-10T11:41:11.550Z] Drizzle ORM instance created.
+[DB][2026-05-10T11:41:11.556Z] DB fully ready ✅
+[DB][2026-05-10T11:42:11.239Z] Running backend server entry
+[DB][2026-05-10T11:42:11.337Z] NODE_ENV:development
+[DB][2026-05-10T11:42:11.340Z] index.ts starting — loading environment...
+[DB][2026-05-10T11:42:11.349Z] Environment loaded.
+[DB][2026-05-10T11:42:11.438Z] DATABASE_URL set:true
+[DB][2026-05-10T11:42:11.525Z] DATABASE_URL preview:postgresql://[REDACTED]
+[DB][2026-05-10T11:42:11.605Z] Connecting to host:db.zubzmhcqnwbkquqsagbq.supabase.co:5432
+[DB][2026-05-10T11:42:11.690Z] Database:postgres
+[DB][2026-05-10T11:42:11.808Z] User:postgres
+[DB][2026-05-10T11:42:11.859Z] Starting database [REDACTED]...
+[DB][2026-05-10T11:42:12.008Z] Verifying Supabase connection...
+[DB][2026-05-10T11:42:12.403Z] index.ts module loaded — DB init running in background...
+[DB][2026-05-10T11:42:14.302Z] Supabase connection verified ✅
+[DB][2026-05-10T11:42:14.311Z] database [REDACTED] complete.
+[DB][2026-05-10T11:42:14.342Z] Postgres connection pool created.
+[DB][2026-05-10T11:42:14.358Z] Drizzle ORM instance created.
+[DB][2026-05-10T11:42:14.393Z] DB fully ready ✅
+[DB][2026-05-10T11:42:49.234Z] Running backend server entry
+[DB][2026-05-10T11:42:49.279Z] NODE_ENV:development
+[DB][2026-05-10T11:42:49.309Z] index.ts starting — loading environment...
+[DB][2026-05-10T11:42:49.340Z] Environment loaded.
+[DB][2026-05-10T11:42:49.360Z] DATABASE_URL set:true
+[DB][2026-05-10T11:42:49.371Z] DATABASE_URL preview:postgresql://[REDACTED]
+[DB][2026-05-10T11:42:49.398Z] Connecting to host:db.zubzmhcqnwbkquqsagbq.supabase.co:5432
+[DB][2026-05-10T11:42:49.423Z] Database:postgres
+[DB][2026-05-10T11:42:49.449Z] User:postgres
+[DB][2026-05-10T11:42:49.469Z] Starting database [REDACTED]...
+[DB][2026-05-10T11:42:49.493Z] Verifying Supabase connection...
+[DB][2026-05-10T11:42:49.516Z] index.ts module loaded — DB init running in background...
+[DB][2026-05-10T11:42:49.929Z] Supabase connection verified ✅
+[DB][2026-05-10T11:42:49.948Z] database [REDACTED] complete.
+[DB][2026-05-10T11:42:49.964Z] Postgres connection pool created.
+[DB][2026-05-10T11:42:50.028Z] Drizzle ORM instance created.
+[DB][2026-05-10T11:42:50.043Z] DB fully ready ✅
+[DB][2026-05-10T11:49:10.229Z] Running backend server entry
+[DB][2026-05-10T11:49:10.232Z] NODE_ENV:development
+[DB][2026-05-10T11:49:10.234Z] index.ts starting — loading environment...
+[DB][2026-05-10T11:49:10.238Z] Environment loaded.
+[DB][2026-05-10T11:49:10.242Z] DATABASE_URL set:true
+[DB][2026-05-10T11:49:10.244Z] DATABASE_URL preview:postgresql://[REDACTED]
+[DB][2026-05-10T11:49:10.245Z] Connecting to host:db.zubzmhcqnwbkquqsagbq.supabase.co:5432
+[DB][2026-05-10T11:49:10.246Z] Database:postgres
+[DB][2026-05-10T11:49:10.247Z] User:postgres
+[DB][2026-05-10T11:49:10.248Z] Starting database [REDACTED]...
+[DB][2026-05-10T11:49:10.266Z] Verifying Supabase connection...
+[DB][2026-05-10T11:49:10.308Z] index.ts module loaded — DB init running in background...
+[DB][2026-05-10T11:49:11.283Z] Supabase connection verified ✅
+[DB][2026-05-10T11:49:11.290Z] database [REDACTED] complete.
+[DB][2026-05-10T11:49:11.291Z] Postgres connection pool created.
+[DB][2026-05-10T11:49:11.306Z] Drizzle ORM instance created.
+[DB][2026-05-10T11:49:11.307Z] DB fully ready ✅
+[DB][2026-05-10T11:49:33.304Z] Running backend server entry
+[DB][2026-05-10T11:49:33.306Z] NODE_ENV:development
+[DB][2026-05-10T11:49:33.307Z] index.ts starting — loading environment...
+[DB][2026-05-10T11:49:33.310Z] Environment loaded.
+[DB][2026-05-10T11:49:33.311Z] DATABASE_URL set:true
+[DB][2026-05-10T11:49:33.312Z] DATABASE_URL preview:postgresql://[REDACTED]
+[DB][2026-05-10T11:49:33.313Z] Connecting to host:db.zubzmhcqnwbkquqsagbq.supabase.co:5432
+[DB][2026-05-10T11:49:33.315Z] Database:postgres
+[DB][2026-05-10T11:49:33.325Z] User:postgres
+[DB][2026-05-10T11:49:33.326Z] Starting database [REDACTED]...
+[DB][2026-05-10T11:49:33.327Z] Verifying Supabase connection...
+[DB][2026-05-10T11:49:33.329Z] index.ts module loaded — DB init running in background...
+[DB][2026-05-10T11:49:34.033Z] Supabase connection verified ✅
+[DB][2026-05-10T11:49:34.036Z] database [REDACTED] complete.
+[DB][2026-05-10T11:49:34.038Z] Postgres connection pool created.
+[DB][2026-05-10T11:49:34.044Z] Drizzle ORM instance created.
+[DB][2026-05-10T11:49:34.045Z] DB fully ready ✅
+[DB][2026-05-10T11:57:42.599Z] Running backend server entry
+[DB][2026-05-10T11:57:42.605Z] NODE_ENV:development
+[DB][2026-05-10T11:57:42.606Z] index.ts starting — loading environment...
+[DB][2026-05-10T11:57:42.608Z] Environment loaded.
+[DB][2026-05-10T11:57:42.609Z] DATABASE_URL set:true
+[DB][2026-05-10T11:57:42.609Z] DATABASE_URL preview:postgresql://[REDACTED]
+[DB][2026-05-10T11:57:42.610Z] Connecting to host:db.zubzmhcqnwbkquqsagbq.supabase.co:5432
+[DB][2026-05-10T11:57:42.611Z] Database:postgres
+[DB][2026-05-10T11:57:42.612Z] User:postgres
+[DB][2026-05-10T11:57:42.612Z] Starting database [REDACTED]...
+[DB][2026-05-10T11:57:42.613Z] Verifying Supabase connection...
+[DB][2026-05-10T11:57:42.627Z] index.ts module loaded — DB init running in background...
+[DB][2026-05-10T11:57:43.501Z] Supabase connection verified ✅
+[DB][2026-05-10T11:57:43.505Z] database [REDACTED] complete.
+[DB][2026-05-10T11:57:43.508Z] Postgres connection pool created.
+[DB][2026-05-10T11:57:43.530Z] Drizzle ORM instance created.
+[DB][2026-05-10T11:57:43.540Z] DB fully ready ✅
+[DB][2026-05-10T11:59:51.629Z] Running backend server entry
+[DB][2026-05-10T11:59:51.631Z] NODE_ENV:development
+[DB][2026-05-10T11:59:51.632Z] index.ts starting — loading environment...
+[DB][2026-05-10T11:59:51.636Z] Environment loaded.
+[DB][2026-05-10T11:59:51.639Z] DATABASE_URL set:true
+[DB][2026-05-10T11:59:51.644Z] DATABASE_URL preview:postgresql://[REDACTED]
+[DB][2026-05-10T11:59:51.646Z] Connecting to host:db.zubzmhcqnwbkquqsagbq.supabase.co:5432
+[DB][2026-05-10T11:59:51.699Z] Database:postgres
+[DB][2026-05-10T11:59:51.715Z] User:postgres
+[DB][2026-05-10T11:59:51.748Z] Starting database [REDACTED]...
+[DB][2026-05-10T11:59:51.831Z] Verifying Supabase connection...
+[DB][2026-05-10T11:59:51.959Z] index.ts module loaded — DB init running in background...
+[DB][2026-05-10T11:59:53.066Z] Supabase connection verified ✅
+[DB][2026-05-10T11:59:53.075Z] database [REDACTED] complete.
+[DB][2026-05-10T11:59:53.082Z] Postgres connection pool created.
+[DB][2026-05-10T11:59:53.087Z] Drizzle ORM instance created.
+[DB][2026-05-10T11:59:53.093Z] DB fully ready ✅
+[DB][2026-05-10T12:03:20.099Z] Running backend server entry
+[DB][2026-05-10T12:03:20.124Z] NODE_ENV:development
+[DB][2026-05-10T12:03:20.127Z] index.ts starting — loading environment...
+[DB][2026-05-10T12:03:20.131Z] Environment loaded.
+[DB][2026-05-10T12:03:20.140Z] DATABASE_URL set:true
+[DB][2026-05-10T12:03:20.142Z] DATABASE_URL preview:postgresql://[REDACTED]
+[DB][2026-05-10T12:03:20.145Z] Connecting to host:db.zubzmhcqnwbkquqsagbq.supabase.co:5432
+[DB][2026-05-10T12:03:20.146Z] Database:postgres
+[DB][2026-05-10T12:03:20.147Z] User:postgres
+[DB][2026-05-10T12:03:20.148Z] Starting database [REDACTED]...
+[DB][2026-05-10T12:03:20.149Z] Verifying Supabase connection...
+[DB][2026-05-10T12:03:20.165Z] index.ts module loaded — DB init running in background...
+[DB][2026-05-10T12:03:20.829Z] Supabase connection verified ✅
+[DB][2026-05-10T12:03:20.842Z] database [REDACTED] complete.
+[DB][2026-05-10T12:03:20.845Z] Postgres connection pool created.
+[DB][2026-05-10T12:03:20.881Z] Drizzle ORM instance created.
+[DB][2026-05-10T12:03:20.891Z] DB fully ready ✅
+[DB][2026-05-10T12:03:44.265Z] Running backend server entry
+[DB][2026-05-10T12:03:44.266Z] NODE_ENV:development
+[DB][2026-05-10T12:03:44.279Z] index.ts starting — loading environment...
+[DB][2026-05-10T12:03:44.322Z] Environment loaded.
+[DB][2026-05-10T12:03:44.324Z] DATABASE_URL set:true
+[DB][2026-05-10T12:03:44.328Z] DATABASE_URL preview:postgresql://[REDACTED]
+[DB][2026-05-10T12:03:44.341Z] Connecting to host:db.zubzmhcqnwbkquqsagbq.supabase.co:5432
+[DB][2026-05-10T12:03:44.344Z] Database:postgres
+[DB][2026-05-10T12:03:44.350Z] User:postgres
+[DB][2026-05-10T12:03:44.356Z] Starting database [REDACTED]...
+[DB][2026-05-10T12:03:44.364Z] Verifying Supabase connection...
+[DB][2026-05-10T12:03:44.376Z] index.ts module loaded — DB init running in background...
+[DB][2026-05-10T12:03:46.741Z] Supabase connection verified ✅
+[DB][2026-05-10T12:03:46.858Z] database [REDACTED] complete.
+[DB][2026-05-10T12:03:46.879Z] Postgres connection pool created.
+[DB][2026-05-10T12:03:46.910Z] Drizzle ORM instance created.
+[DB][2026-05-10T12:03:46.917Z] DB fully ready ✅
+[DB][2026-05-10T12:03:55.414Z] Running backend server entry
+[DB][2026-05-10T12:03:55.415Z] NODE_ENV:development
+[DB][2026-05-10T12:03:55.415Z] index.ts starting — loading environment...
+[DB][2026-05-10T12:03:55.417Z] Environment loaded.
+[DB][2026-05-10T12:03:55.419Z] DATABASE_URL set:true
+[DB][2026-05-10T12:03:55.428Z] DATABASE_URL preview:postgresql://[REDACTED]
+[DB][2026-05-10T12:03:55.431Z] Connecting to host:db.zubzmhcqnwbkquqsagbq.supabase.co:5432
+[DB][2026-05-10T12:03:55.432Z] Database:postgres
+[DB][2026-05-10T12:03:55.433Z] User:postgres
+[DB][2026-05-10T12:03:55.434Z] Starting database [REDACTED]...
+[DB][2026-05-10T12:03:55.435Z] Verifying Supabase connection...
+[DB][2026-05-10T12:03:55.440Z] index.ts module loaded — DB init running in background...
+[DB][2026-05-10T12:03:56.263Z] Supabase connection verified ✅
+[DB][2026-05-10T12:03:56.357Z] database [REDACTED] complete.
+[DB][2026-05-10T12:03:56.417Z] Postgres connection pool created.
+[DB][2026-05-10T12:03:56.441Z] Drizzle ORM instance created.
+[DB][2026-05-10T12:03:56.447Z] DB fully ready ✅
+[DB][2026-05-10T12:10:24.520Z] Running backend server entry
+[DB][2026-05-10T12:10:24.530Z] NODE_ENV:development
+[DB][2026-05-10T12:10:24.533Z] index.ts starting — loading environment...
+[DB][2026-05-10T12:10:24.542Z] Environment loaded.
+[DB][2026-05-10T12:10:24.544Z] DATABASE_URL set:true
+[DB][2026-05-10T12:10:24.545Z] DATABASE_URL preview:postgresql://[REDACTED]
+[DB][2026-05-10T12:10:24.546Z] Connecting to host:db.zubzmhcqnwbkquqsagbq.supabase.co:5432
+[DB][2026-05-10T12:10:24.546Z] Database:postgres
+[DB][2026-05-10T12:10:24.547Z] User:postgres
+[DB][2026-05-10T12:10:24.548Z] Starting database [REDACTED]...
+[DB][2026-05-10T12:10:24.550Z] Verifying Supabase connection...
+[DB][2026-05-10T12:10:24.561Z] index.ts module loaded — DB init running in background...
+[DB][2026-05-10T12:10:25.743Z] Supabase connection verified ✅
+[DB][2026-05-10T12:10:25.750Z] database [REDACTED] complete.
+[DB][2026-05-10T12:10:25.753Z] Postgres connection pool created.
+[DB][2026-05-10T12:10:25.760Z] Drizzle ORM instance created.
+[DB][2026-05-10T12:10:25.761Z] DB fully ready ✅
+[DB][2026-05-10T12:10:53.065Z] Running backend server entry
+[DB][2026-05-10T12:10:53.081Z] NODE_ENV:development
+[DB][2026-05-10T12:10:53.090Z] index.ts starting — loading environment...
+[DB][2026-05-10T12:10:53.131Z] Environment loaded.
+[DB][2026-05-10T12:10:53.133Z] DATABASE_URL set:true
+[DB][2026-05-10T12:10:53.150Z] DATABASE_URL preview:postgresql://[REDACTED]
+[DB][2026-05-10T12:10:53.153Z] Connecting to host:db.zubzmhcqnwbkquqsagbq.supabase.co:5432
+[DB][2026-05-10T12:10:53.165Z] Database:postgres
+[DB][2026-05-10T12:10:53.180Z] User:postgres
+[DB][2026-05-10T12:10:53.182Z] Starting database [REDACTED]...
+[DB][2026-05-10T12:10:53.188Z] Verifying Supabase connection...
+[DB][2026-05-10T12:10:53.197Z] index.ts module loaded — DB init running in background...
+[DB][2026-05-10T12:10:54.232Z] Supabase connection verified ✅
+[DB][2026-05-10T12:10:54.242Z] database [REDACTED] complete.
+[DB][2026-05-10T12:10:54.248Z] Postgres connection pool created.
+[DB][2026-05-10T12:10:54.257Z] Drizzle ORM instance created.
+[DB][2026-05-10T12:10:54.264Z] DB fully ready ✅
+[DB][2026-05-10T12:11:03.543Z] Running backend server entry
+[DB][2026-05-10T12:11:03.555Z] NODE_ENV:development
+[DB][2026-05-10T12:11:03.596Z] index.ts starting — loading environment...
+[DB][2026-05-10T12:11:03.654Z] Environment loaded.
+[DB][2026-05-10T12:11:03.681Z] DATABASE_URL set:true
+[DB][2026-05-10T12:11:03.695Z] DATABASE_URL preview:postgresql://[REDACTED]
+[DB][2026-05-10T12:11:03.705Z] Connecting to host:db.zubzmhcqnwbkquqsagbq.supabase.co:5432
+[DB][2026-05-10T12:11:03.719Z] Database:postgres
+[DB][2026-05-10T12:11:03.732Z] User:postgres
+[DB][2026-05-10T12:11:03.745Z] Starting database [REDACTED]...
+[DB][2026-05-10T12:11:03.755Z] Verifying Supabase connection...
+[DB][2026-05-10T12:11:03.765Z] index.ts module loaded — DB init running in background...
+[DB][2026-05-10T12:11:04.305Z] Supabase connection verified ✅
+[DB][2026-05-10T12:11:04.326Z] database [REDACTED] complete.
+[DB][2026-05-10T12:11:04.377Z] Postgres connection pool created.
+[DB][2026-05-10T12:11:04.387Z] Drizzle ORM instance created.
+[DB][2026-05-10T12:11:04.391Z] DB fully ready ✅
+[DB][2026-05-10T12:15:09.816Z] Running backend server entry
+[DB][2026-05-10T12:15:09.818Z] NODE_ENV:development
+[DB][2026-05-10T12:15:09.819Z] index.ts starting — loading environment...
+[DB][2026-05-10T12:15:09.834Z] Environment loaded.
+[DB][2026-05-10T12:15:09.836Z] DATABASE_URL set:true
+[DB][2026-05-10T12:15:09.837Z] DATABASE_URL preview:postgresql://[REDACTED]
+[DB][2026-05-10T12:15:09.839Z] Connecting to host:db.zubzmhcqnwbkquqsagbq.supabase.co:5432
+[DB][2026-05-10T12:15:09.845Z] Database:postgres
+[DB][2026-05-10T12:15:09.847Z] User:postgres
+[DB][2026-05-10T12:15:09.848Z] Starting database [REDACTED]...
+[DB][2026-05-10T12:15:09.849Z] Verifying Supabase connection...
+[DB][2026-05-10T12:15:09.866Z] index.ts module loaded — DB init running in background...
+[DB][2026-05-10T12:15:10.438Z] Supabase connection verified ✅
+[DB][2026-05-10T12:15:10.468Z] database [REDACTED] complete.
+[DB][2026-05-10T12:15:10.472Z] Postgres connection pool created.
+[DB][2026-05-10T12:15:10.484Z] Drizzle ORM instance created.
+[DB][2026-05-10T12:15:10.498Z] DB fully ready ✅
+[DB][2026-05-10T12:19:21.920Z] Running backend server entry
+[DB][2026-05-10T12:19:21.923Z] NODE_ENV:development
+[DB][2026-05-10T12:19:21.924Z] index.ts starting — loading environment...
+[DB][2026-05-10T12:19:21.927Z] Environment loaded.
+[DB][2026-05-10T12:19:21.928Z] DATABASE_URL set:true
+[DB][2026-05-10T12:19:21.931Z] DATABASE_URL preview:postgresql://[REDACTED]
+[DB][2026-05-10T12:19:21.932Z] Connecting to host:db.zubzmhcqnwbkquqsagbq.supabase.co:5432
+[DB][2026-05-10T12:19:21.933Z] Database:postgres
+[DB][2026-05-10T12:19:21.940Z] User:postgres
+[DB][2026-05-10T12:19:21.947Z] Starting database [REDACTED]...
+[DB][2026-05-10T12:19:21.957Z] Verifying Supabase connection...
+[DB][2026-05-10T12:19:21.984Z] index.ts module loaded — DB init running in background...
+[DB][2026-05-10T12:19:23.977Z] Supabase connection verified ✅
+[DB][2026-05-10T12:19:23.996Z] database [REDACTED] complete.
+[DB][2026-05-10T12:19:24.002Z] Postgres connection pool created.
+[DB][2026-05-10T12:19:24.065Z] Drizzle ORM instance created.
+[DB][2026-05-10T12:19:24.099Z] DB fully ready ✅
+[DB][2026-05-10T12:23:17.184Z] Running backend server entry
+[DB][2026-05-10T12:23:17.193Z] NODE_ENV:development
+[DB][2026-05-10T12:23:17.194Z] index.ts starting — loading environment...
+[DB][2026-05-10T12:23:17.199Z] Environment loaded.
+[DB][2026-05-10T12:23:17.211Z] DATABASE_URL set:true
+[DB][2026-05-10T12:23:17.212Z] DATABASE_URL preview:postgresql://[REDACTED]
+[DB][2026-05-10T12:23:17.214Z] Connecting to host:db.zubzmhcqnwbkquqsagbq.supabase.co:5432
+[DB][2026-05-10T12:23:17.215Z] Database:postgres
+[DB][2026-05-10T12:23:17.216Z] User:postgres
+[DB][2026-05-10T12:23:17.217Z] Starting database [REDACTED]...
+[DB][2026-05-10T12:23:17.222Z] Verifying Supabase connection...
+[DB][2026-05-10T12:23:17.237Z] index.ts module loaded — DB init running in background...
+[DB][2026-05-10T12:23:18.677Z] Supabase connection verified ✅
+[DB][2026-05-10T12:23:18.710Z] database [REDACTED] complete.
+[DB][2026-05-10T12:23:18.750Z] Postgres connection pool created.
+[DB][2026-05-10T12:23:18.913Z] Drizzle ORM instance created.
+[DB][2026-05-10T12:23:19.233Z] DB fully ready ✅
+[DB][2026-05-10T13:35:50.667Z] Running backend server entry
+[DB][2026-05-10T13:35:50.682Z] NODE_ENV:development
+[DB][2026-05-10T13:35:50.685Z] index.ts starting — loading environment...
+[DB][2026-05-10T13:35:50.689Z] Environment loaded.
+[DB][2026-05-10T13:35:50.690Z] DATABASE_URL set:true
+[DB][2026-05-10T13:35:50.690Z] DATABASE_URL preview:postgresql://[REDACTED]
+[DB][2026-05-10T13:35:50.691Z] Connecting to host:db.zubzmhcqnwbkquqsagbq.supabase.co:5432
+[DB][2026-05-10T13:35:50.692Z] Database:postgres
+[DB][2026-05-10T13:35:50.693Z] User:postgres
+[DB][2026-05-10T13:35:50.694Z] Starting database [REDACTED]...
+[DB][2026-05-10T13:35:50.695Z] Verifying Supabase connection...
+[DB][2026-05-10T13:35:50.712Z] index.ts module loaded — DB init running in background...
+[DB][2026-05-10T13:35:51.391Z] Supabase connection verified ✅
+[DB][2026-05-10T13:35:51.411Z] database [REDACTED] complete.
+[DB][2026-05-10T13:35:51.421Z] Postgres connection pool created.
+[DB][2026-05-10T13:35:51.454Z] Drizzle ORM instance created.
+[DB][2026-05-10T13:35:51.515Z] DB fully ready ✅
+[DB][2026-05-10T13:40:07.501Z] Running backend server entry
+[DB][2026-05-10T13:40:07.505Z] NODE_ENV:development
+[DB][2026-05-10T13:40:07.507Z] index.ts starting — loading environment...
+[DB][2026-05-10T13:40:07.509Z] Environment loaded.
+[DB][2026-05-10T13:40:07.510Z] DATABASE_URL set:true
+[DB][2026-05-10T13:40:07.516Z] DATABASE_URL preview:postgresql://[REDACTED]
+[DB][2026-05-10T13:40:07.521Z] Connecting to host:db.zubzmhcqnwbkquqsagbq.supabase.co:5432
+[DB][2026-05-10T13:40:07.526Z] Database:postgres
+[DB][2026-05-10T13:40:07.531Z] User:postgres
+[DB][2026-05-10T13:40:07.536Z] Starting database [REDACTED]...
+[DB][2026-05-10T13:40:07.538Z] Verifying Supabase connection...
+[DB][2026-05-10T13:40:07.547Z] index.ts module loaded — DB init running in background...
+[DB][2026-05-10T13:40:08.318Z] Supabase connection verified ✅
+[DB][2026-05-10T13:40:08.321Z] database [REDACTED] complete.
+[DB][2026-05-10T13:40:08.322Z] Postgres connection pool created.
+[DB][2026-05-10T13:40:08.349Z] Drizzle ORM instance created.
+[DB][2026-05-10T13:40:08.361Z] DB fully ready ✅
+[DB][2026-05-10T13:40:34.193Z] Running backend server entry
+[DB][2026-05-10T13:40:34.208Z] NODE_ENV:development
+[DB][2026-05-10T13:40:34.210Z] index.ts starting — loading environment...
+[DB][2026-05-10T13:40:34.223Z] Environment loaded.
+[DB][2026-05-10T13:40:34.224Z] DATABASE_URL set:true
+[DB][2026-05-10T13:40:34.227Z] DATABASE_URL preview:postgresql://[REDACTED]
+[DB][2026-05-10T13:40:34.293Z] Connecting to host:db.zubzmhcqnwbkquqsagbq.supabase.co:5432
+[DB][2026-05-10T13:40:34.405Z] Database:postgres
+[DB][2026-05-10T13:40:34.439Z] User:postgres
+[DB][2026-05-10T13:40:34.475Z] Starting database [REDACTED]...
+[DB][2026-05-10T13:40:34.576Z] Verifying Supabase connection...
+[DB][2026-05-10T13:40:34.606Z] index.ts module loaded — DB init running in background...
+[DB][2026-05-10T13:40:40.571Z] Supabase connection verified ✅
+[DB][2026-05-10T13:40:40.793Z] database [REDACTED] complete.
+[DB][2026-05-10T13:40:41.037Z] Postgres connection pool created.
+[DB][2026-05-10T13:40:41.138Z] Drizzle ORM instance created.
+[DB][2026-05-10T13:40:41.307Z] DB fully ready ✅
+[DB][2026-05-10T13:41:00.461Z] Running backend server entry
+[DB][2026-05-10T13:41:00.463Z] NODE_ENV:development
+[DB][2026-05-10T13:41:00.464Z] index.ts starting — loading environment...
+[DB][2026-05-10T13:41:00.467Z] Environment loaded.
+[DB][2026-05-10T13:41:00.470Z] DATABASE_URL set:true
+[DB][2026-05-10T13:41:00.471Z] DATABASE_URL preview:postgresql://[REDACTED]
+[DB][2026-05-10T13:41:00.472Z] Connecting to host:db.zubzmhcqnwbkquqsagbq.supabase.co:5432
+[DB][2026-05-10T13:41:00.472Z] Database:postgres
+[DB][2026-05-10T13:41:00.472Z] User:postgres
+[DB][2026-05-10T13:41:00.473Z] Starting database [REDACTED]...
+[DB][2026-05-10T13:41:00.474Z] Verifying Supabase connection...
+[DB][2026-05-10T13:41:00.476Z] index.ts module loaded — DB init running in background...
+[DB][2026-05-10T13:41:01.134Z] Supabase connection verified ✅
+[DB][2026-05-10T13:41:01.141Z] database [REDACTED] complete.
+[DB][2026-05-10T13:41:01.171Z] Postgres connection pool created.
+[DB][2026-05-10T13:41:01.197Z] Drizzle ORM instance created.
+[DB][2026-05-10T13:41:01.212Z] DB fully ready ✅
+[DB][2026-08-19T03:29:18.594Z] Running backend server entry
+[DB][2026-08-19T03:29:18.712Z] NODE_ENV:development
+[DB][2026-08-19T03:29:18.721Z] index.ts starting — loading environment...
+[DB][2026-08-19T03:29:18.777Z] Environment loaded.
+[DB][2026-08-19T03:29:18.812Z] DATABASE_URL set:true
+[DB][2026-08-19T03:29:18.871Z] DATABASE_URL preview:postgresql://[REDACTED]
+[DB][2026-08-19T03:29:18.910Z] Connecting to host:db.zubzmhcqnwbkquqsagbq.supabase.co:5432
+[DB][2026-08-19T03:29:18.954Z] Database:postgres
+[DB][2026-08-19T03:29:18.979Z] User:postgres
+[DB][2026-08-19T03:29:19.029Z] Starting database [REDACTED]...
+[DB][2026-08-19T03:29:19.083Z] Verifying Supabase connection...
+[DB][2026-08-19T03:29:19.286Z] index.ts module loaded — DB init running in background...
+[DB][2026-08-19T03:29:19.587Z] Supabase connection test failed:getaddrinfo ENOTFOUND db.zubzmhcqnwbkquqsagbq.supabase.co
+[DB][2026-08-19T03:29:19.627Z] Attempt 1/3 failed: database [REDACTED] failed: getaddrinfo ENOTFOUND db.zubzmhcqnwbkquqsagbq.supabase.co
+[DB][2026-08-19T03:29:19.645Z] Retrying in 2000ms...
+[DB][2026-08-19T03:29:21.682Z] Verifying Supabase connection...
+[DB][2026-08-19T03:29:21.726Z] Supabase connection test failed:getaddrinfo ENOTFOUND db.zubzmhcqnwbkquqsagbq.supabase.co
+[DB][2026-08-19T03:29:21.744Z] Attempt 2/3 failed: database [REDACTED] failed: getaddrinfo ENOTFOUND db.zubzmhcqnwbkquqsagbq.supabase.co
+[DB][2026-08-19T03:29:21.770Z] Retrying in 2000ms...
+[DB][2026-08-19T03:29:23.849Z] Verifying Supabase connection...
+[DB][2026-08-19T03:29:23.906Z] Supabase connection test failed:getaddrinfo ENOTFOUND db.zubzmhcqnwbkquqsagbq.supabase.co
+[DB][2026-08-19T03:29:23.920Z] Attempt 3/3 failed: database [REDACTED] failed: getaddrinfo ENOTFOUND db.zubzmhcqnwbkquqsagbq.supabase.co
+[DB][2026-08-19T03:29:23.929Z] initializeDatabase() failed.
+[DB][2026-08-19T03:41:38.900Z] Running backend server entry
+[DB][2026-08-19T03:41:38.910Z] NODE_ENV:development
+[DB][2026-08-19T03:41:38.918Z] index.ts starting — loading environment...
+[DB][2026-08-19T03:41:38.945Z] Environment loaded.
+[DB][2026-08-19T03:41:38.951Z] DATABASE_URL set:true
+[DB][2026-08-19T03:41:39.000Z] DATABASE_URL preview:postgresql://[REDACTED]
+[DB][2026-08-19T03:41:39.013Z] Connecting to host:db.zubzmhcqnwbkquqsagbq.supabase.co:5432
+[DB][2026-08-19T03:41:39.019Z] Database:postgres
+[DB][2026-08-19T03:41:39.088Z] User:postgres
+[DB][2026-08-19T03:41:39.111Z] Starting database [REDACTED]...
+[DB][2026-08-19T03:41:39.135Z] Verifying Supabase connection...
+[DB][2026-08-19T03:41:39.202Z] index.ts module loaded — DB init running in background...
+[DB][2026-08-19T03:41:39.294Z] Supabase connection test failed:getaddrinfo ENOTFOUND db.zubzmhcqnwbkquqsagbq.supabase.co
+[DB][2026-08-19T03:41:39.317Z] Attempt 1/3 failed: database [REDACTED] failed: getaddrinfo ENOTFOUND db.zubzmhcqnwbkquqsagbq.supabase.co
+[DB][2026-08-19T03:41:39.348Z] Retrying in 2000ms...
+[DB][2026-08-19T03:41:41.396Z] Verifying Supabase connection...
+[DB][2026-08-19T03:41:41.800Z] Supabase connection test failed:getaddrinfo ENOTFOUND db.zubzmhcqnwbkquqsagbq.supabase.co
+[DB][2026-08-19T03:41:41.946Z] Attempt 2/3 failed: database [REDACTED] failed: getaddrinfo ENOTFOUND db.zubzmhcqnwbkquqsagbq.supabase.co
+[DB][2026-08-19T03:41:42.004Z] Retrying in 2000ms...
+[DB][2026-08-19T03:41:44.077Z] Verifying Supabase connection...
+[DB][2026-08-19T03:41:44.096Z] Supabase connection test failed:getaddrinfo ENOTFOUND db.zubzmhcqnwbkquqsagbq.supabase.co
+[DB][2026-08-19T03:41:44.103Z] Attempt 3/3 failed: database [REDACTED] failed: getaddrinfo ENOTFOUND db.zubzmhcqnwbkquqsagbq.supabase.co
+[DB][2026-08-19T03:41:44.150Z] initializeDatabase() failed.
+[DB][2026-08-19T03:44:33.187Z] Running backend server entry
+[DB][2026-08-19T03:44:33.190Z] NODE_ENV:development
+[DB][2026-08-19T03:44:33.192Z] index.ts starting — loading environment...
+[DB][2026-08-19T03:44:33.208Z] Environment loaded.
+[DB][2026-08-19T03:44:33.210Z] DATABASE_URL set:true
+[DB][2026-08-19T03:44:33.279Z] DATABASE_URL preview:postgresql://[REDACTED]
+[DB][2026-08-19T03:44:33.316Z] Connecting to host:aws-1-ap-northeast-1.pooler.supabase.com:5432
+[DB][2026-08-19T03:44:33.346Z] Database:postgres
+[DB][2026-08-19T03:44:33.356Z] User:postgres.uciyiafsfguraufwdgsj
+[DB][2026-08-19T03:44:33.363Z] Starting database [REDACTED]...
+[DB][2026-08-19T03:44:33.373Z] Verifying Supabase connection...
+[DB][2026-08-19T03:44:33.394Z] index.ts module loaded — DB init running in background...
+[DB][2026-08-19T03:44:34.100Z] Supabase connection verified ✅
+[DB][2026-08-19T03:44:34.109Z] database [REDACTED] complete.
+[DB][2026-08-19T03:44:34.111Z] Postgres connection pool created.
+[DB][2026-08-19T03:44:34.117Z] Drizzle ORM instance created.
+[DB][2026-08-19T03:44:34.245Z] DB fully ready ✅
+[DB][2026-08-19T04:05:37.265Z] Running backend server entry
+[DB][2026-08-19T04:05:37.277Z] NODE_ENV:development
+[DB][2026-08-19T04:05:37.442Z] index.ts starting — loading environment...
+[DB][2026-08-19T04:05:37.450Z] Environment loaded.
+[DB][2026-08-19T04:05:37.451Z] DATABASE_URL set:true
+[DB][2026-08-19T04:05:37.452Z] DATABASE_URL preview:postgresql://[REDACTED]
+[DB][2026-08-19T04:05:37.458Z] Connecting to host:aws-1-ap-northeast-1.pooler.supabase.com:5432
+[DB][2026-08-19T04:05:37.462Z] Database:postgres
+[DB][2026-08-19T04:05:37.463Z] User:postgres.uciyiafsfguraufwdgsj
+[DB][2026-08-19T04:05:37.465Z] Starting database [REDACTED]...
+[DB][2026-08-19T04:05:37.466Z] Verifying Supabase connection...
+[DB][2026-08-19T04:05:37.480Z] index.ts module loaded — DB init running in background...
+[DB][2026-08-19T04:05:38.444Z] Supabase connection verified ✅
+[DB][2026-08-19T04:05:38.469Z] database [REDACTED] complete.
+[DB][2026-08-19T04:05:38.479Z] Postgres connection pool created.
+[DB][2026-08-19T04:05:38.499Z] Drizzle ORM instance created.
+[DB][2026-08-19T04:05:38.500Z] DB fully ready ✅
+[DB][2026-08-19T04:09:13.298Z] Running backend server entry
+[DB][2026-08-19T04:09:13.310Z] NODE_ENV:development
+[DB][2026-08-19T04:09:13.314Z] index.ts starting — loading environment...
+[DB][2026-08-19T04:09:13.324Z] Environment loaded.
+[DB][2026-08-19T04:09:13.325Z] DATABASE_URL set:true
+[DB][2026-08-19T04:09:13.327Z] DATABASE_URL preview:postgresql://[REDACTED]
+[DB][2026-08-19T04:09:13.332Z] Connecting to host:aws-1-ap-northeast-1.pooler.supabase.com:5432
+[DB][2026-08-19T04:09:13.338Z] Database:postgres
+[DB][2026-08-19T04:09:13.342Z] User:postgres.uciyiafsfguraufwdgsj
+[DB][2026-08-19T04:09:13.344Z] Starting database [REDACTED]...
+[DB][2026-08-19T04:09:13.347Z] Verifying Supabase connection...
+[DB][2026-08-19T04:09:13.359Z] index.ts module loaded — DB init running in background...
+[DB][2026-08-19T04:09:13.889Z] Supabase connection verified ✅
+[DB][2026-08-19T04:09:13.911Z] database [REDACTED] complete.
+[DB][2026-08-19T04:09:13.999Z] Postgres connection pool created.
+[DB][2026-08-19T04:09:14.096Z] Drizzle ORM instance created.
+[DB][2026-08-19T04:09:14.191Z] DB fully ready ✅
+[DB][2026-08-19T04:52:29.581Z] Running backend server entry
+[DB][2026-08-19T04:52:29.591Z] NODE_ENV:development
+[DB][2026-08-19T04:52:29.593Z] index.ts starting — loading environment...
+[DB][2026-08-19T04:52:29.597Z] Environment loaded.
+[DB][2026-08-19T04:52:29.605Z] DATABASE_URL set:true
+[DB][2026-08-19T04:52:29.607Z] DATABASE_URL preview:postgresql://[REDACTED]
+[DB][2026-08-19T04:52:29.608Z] Connecting to host:aws-1-ap-northeast-1.pooler.supabase.com:5432
+[DB][2026-08-19T04:52:29.609Z] Database:postgres
+[DB][2026-08-19T04:52:29.610Z] User:postgres.uciyiafsfguraufwdgsj
+[DB][2026-08-19T04:52:29.614Z] Reusing existing DB pool from previous module load (HMR).
+[DB][2026-08-19T04:52:29.620Z] index.ts module loaded — DB init running in background...
+[DB][2026-08-19T07:21:26.271Z] Running backend server entry
+[DB][2026-08-19T07:21:26.286Z] NODE_ENV:development
+[DB][2026-08-19T07:21:26.296Z] index.ts starting — loading environment...
+[DB][2026-08-19T07:21:26.497Z] Environment loaded.
+[DB][2026-08-19T07:21:26.501Z] DATABASE_URL set:true
+[DB][2026-08-19T07:21:26.515Z] DATABASE_URL preview:postgresql://[REDACTED]
+[DB][2026-08-19T07:21:26.525Z] Connecting to host:aws-1-ap-northeast-1.pooler.supabase.com:5432
+[DB][2026-08-19T07:21:26.534Z] Database:postgres
+[DB][2026-08-19T07:21:26.542Z] User:postgres.uciyiafsfguraufwdgsj
+[DB][2026-08-19T07:21:26.838Z] Reusing existing DB pool from previous module load (HMR).
+[DB][2026-08-19T07:21:26.841Z] index.ts module loaded — DB init running in background...

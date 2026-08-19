@@ -11,7 +11,7 @@ const logDir  = path.join(process.cwd(), 'logs');
 const logFile = path.join(logDir, 'db_debug.log');
 if (!fs.existsSync(logDir)) fs.mkdirSync(logDir, { recursive: true });
 
-function logDb(msg: string, ...args: any[]) {
+function logDb(msg: string, ...args: unknown[]) {
   const timestamp = new Date().toISOString();
   let safeMsg = msg;
 
@@ -37,34 +37,23 @@ function logDb(msg: string, ...args: any[]) {
 
   fs.appendFileSync(logFile, fullMsg);
 
-  // Always log to stdout so Electron captures it in server.stdout
+  // Always log to stdout for web app access
   console.log(`[DB][${timestamp}]`, safeMsg, ...safeArgs);
 }
 
-// --- Electron Context Check ---
-const isElectron    = !!process.versions.electron;
-const isMainProcess =
-  isElectron &&
-  typeof (process as any).type === 'string' &&
-  (process as any).type === 'browser';
-
+// --- Environment Info ---
 logDb('Running backend server entry');
 logDb('NODE_ENV:', process.env.NODE_ENV);
-logDb('isElectron:', isElectron);
-logDb('isMainProcess:', isMainProcess);
-
-if (isMainProcess) {
-  logDb('Skipping backend logic in Electron main process');
-  process.exit(0);
-}
 
 // --- Load Environment ---
 logDb('index.ts starting — loading environment...');
 try {
   loadEnv();
   logDb('Environment loaded.');
-} catch (e: any) {
-  logDb('Error loading environment:', e?.message);
+} catch (e: unknown) {
+  const error = e instanceof Error ? e.message : String(e);
+  logDb('Error loading environment:', error);
+  throw new Error(`Failed to load environment: ${error}`);
 }
 
 // --- Confirm DATABASE_URL reached this process ---
@@ -72,21 +61,19 @@ logDb('DATABASE_URL set:', !!process.env.DATABASE_URL);
 if (process.env.DATABASE_URL) {
   logDb('DATABASE_URL preview:', process.env.DATABASE_URL.substring(0, 40) + '...');
 } else {
-  console.error('[DB] FATAL: DATABASE_URL is not set!');
-  console.error('[DB] .env file may be missing or DATABASE_URL not defined inside it.');
-  process.exit(1);
+  const msg = 'FATAL: DATABASE_URL is not set! .env file may be missing or DATABASE_URL not defined.';
+  console.error('[DB]', msg);
+  logDb(msg);
+  throw new Error(msg);
 }
 
 // --- Postgres / Supabase Connection Config ---
 const DB_CONFIG = {
   connectionString: process.env.DATABASE_URL,
-  // ✅ Required for Supabase — uses self-signed cert in production
-  ssl: process.env.NODE_ENV === 'production'
-    ? { rejectUnauthorized: false }
-    : false,
-  max: 10,
+  ssl: { rejectUnauthorized: false }, // Supabase requires SSL in ALL environments
+  max: 5,
   idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 5000,
+  connectionTimeoutMillis: 10000, // give more headroom in case the pooler is cold-starting
 };
 
 // Log connection info (safely — never log full URL with password)
@@ -106,12 +93,11 @@ async function initializeDatabase(): Promise<void> {
   try {
     await testPool.query('SELECT 1');
     logDb('Supabase connection verified ✅');
-  } catch (err: any) {
-    // Print full error to stderr so Electron crash dialog captures it
-    console.error('[DB] Connection FAILED:', err.message);
-    console.error('[DB] Full error:', err);
-    logDb('Supabase connection test failed:', err.message);
-    throw err;
+  } catch (err: unknown) {
+    const error = err instanceof Error ? err.message : String(err);
+    console.error('[DB] Connection FAILED:', error);
+    logDb('Supabase connection test failed:', error);
+    throw new Error(`Database connection failed: ${error}`);
   } finally {
     await testPool.end();
   }
@@ -126,8 +112,9 @@ async function withRetry<T>(
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
       return await fn();
-    } catch (err: any) {
-      logDb(`Attempt ${attempt}/${retries} failed: ${err?.message}`);
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err.message : String(err);
+      logDb(`Attempt ${attempt}/${retries} failed: ${error}`);
       if (attempt === retries) throw err;
       logDb(`Retrying in ${delayMs}ms...`);
       await new Promise(res => setTimeout(res, delayMs));
@@ -137,35 +124,53 @@ async function withRetry<T>(
 }
 
 // --- Global DB Pool and Drizzle ---
-let pool: Pool;
+// --- Global DB Pool and Drizzle (persisted across HMR reloads in dev) ---
+const globalForDb = globalThis as unknown as {
+  __pgPool?: Pool;
+  __dbInitPromise?: Promise<void>;
+  __dbInitialized?: boolean;
+};
+
+let pool: Pool = globalForDb.__pgPool!;
 let db: ReturnType<typeof drizzle>;
-let dbInitialized  = false;
+let dbInitialized = globalForDb.__dbInitialized ?? false;
 let dbInitPromise: Promise<void>;
 
-// Initialize immediately on import
-dbInitPromise = (async () => {
-  try {
-    logDb('Starting database initialization...');
-    await withRetry(() => initializeDatabase(), 3, 2000);
-    logDb('Database initialization complete.');
-  } catch (e: any) {
-    // ✅ Full error to stderr — Electron crash dialog will show this
-    console.error('[DB] FATAL: Database initialization failed after all retries.');
-    console.error('[DB] Error:', e?.message);
-    console.error('[DB] Stack:', e?.stack);
-    logDb('initializeDatabase() failed. Exiting.');
-    process.exit(1);
-  }
-
-  pool = new Pool(DB_CONFIG);
-  logDb('Postgres connection pool created.');
-
+if (globalForDb.__pgPool && globalForDb.__dbInitialized) {
+  // Reuse the pool from a previous module load (dev HMR) instead of
+  // creating a new one — prevents leaking connections on every reload.
+  pool = globalForDb.__pgPool;
   db = drizzle(pool, { schema });
-  logDb('Drizzle ORM instance created.');
-
   dbInitialized = true;
-  logDb('DB fully ready ✅');
-})();
+  dbInitPromise = Promise.resolve();
+  logDb('Reusing existing DB pool from previous module load (HMR).');
+} else {
+  dbInitPromise = (async () => {
+    try {
+      logDb('Starting database initialization...');
+      await withRetry(() => initializeDatabase(), 3, 2000);
+      logDb('Database initialization complete.');
+    } catch (e: unknown) {
+      const error = e instanceof Error ? e.message : String(e);
+      console.error('[DB] FATAL: Database initialization failed after all retries.');
+      console.error('[DB] Error:', error);
+      logDb('initializeDatabase() failed.');
+      throw e;
+    }
+
+    pool = new Pool(DB_CONFIG);
+    logDb('Postgres connection pool created.');
+
+    db = drizzle(pool, { schema });
+    logDb('Drizzle ORM instance created.');
+
+    dbInitialized = true;
+    globalForDb.__pgPool = pool;
+    globalForDb.__dbInitialized = true;
+    logDb('DB fully ready ✅');
+  })();
+  globalForDb.__dbInitPromise = dbInitPromise;
+}
 
 // --- Export: Wait for DB ---
 export async function waitForDb() {
@@ -195,8 +200,9 @@ export async function checkDbConnection(): Promise<boolean> {
     await pool.query('SELECT 1');
     logDb('Health check: OK ✅');
     return true;
-  } catch (error: any) {
-    logDb('Health check: FAILED ❌', error.message);
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : String(error);
+    logDb('Health check: FAILED ❌', msg);
     return false;
   }
 }

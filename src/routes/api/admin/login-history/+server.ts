@@ -2,7 +2,7 @@ import { json, error as httpError } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db';
 import { loginAuditLog, users } from '$lib/server/db/schema';
-import { desc, limit, eq } from 'drizzle-orm';
+import { desc, eq } from 'drizzle-orm';
 
 // GET /api/admin/login-history
 // Returns the last 20 successful super_admin logins for monitoring

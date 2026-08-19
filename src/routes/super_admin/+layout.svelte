@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
-	import { page } from '$app/stores';
-	import { onMount } from 'svelte';
+	import { goto } from "$app/navigation";
+	import { page } from "$app/stores";
+	import { onMount } from "svelte";
 	$: currentPath = $page.url.pathname;
-	import { getApiBaseUrl } from '$lib/utils/apiBase';
+	import { getApiBaseUrl } from "$lib/utils/apiBase";
 	let isSidebarCollapsed = false;
 	let screenWidth = 0;
 
@@ -22,14 +22,14 @@
 			}
 		};
 
-		window.addEventListener('resize', handleResize);
-		return () => window.removeEventListener('resize', handleResize);
+		window.addEventListener("resize", handleResize);
+		return () => window.removeEventListener("resize", handleResize);
 	});
 
 	async function logout() {
 		// This calls your logout API and redirects to login
-		await fetch(getApiBaseUrl() + '/api/logout', { method: 'POST' });
-		goto('/login');
+		await fetch(getApiBaseUrl() + "/api/logout", { method: "POST" });
+		goto("/login");
 	}
 </script>
 
@@ -42,12 +42,14 @@
 
 	<aside class="sidenav">
 		<div class="sidebar-header">
-			<div class="logo-container"><img src="/JJGAPO.png" alt="JJGAPO Logo" class="logo-img" /></div>
+			<div class="logo-container">
+				<img src="/JJGAPO.png" alt="JJGAPO Logo" class="logo-img" />
+			</div>
 		</div>
 		<nav>
 			<a
 				href="/super_admin/dashboard"
-				class:active={currentPath.startsWith('/super_admin/dashboard')}
+				class:active={currentPath.startsWith("/super_admin/dashboard")}
 				data-tooltip="Dashboard"
 			>
 				<span class="nav-icon"
@@ -65,11 +67,15 @@
 			</a>
 			<a
 				href="/super_admin/stocks"
-				class:active={currentPath.startsWith('/super_admin/stocks')}
+				class:active={currentPath.startsWith("/super_admin/stocks")}
 				data-tooltip="Stocks"
 			>
 				<span class="nav-icon"
-					><svg height="20px" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" fill="#000000"
+					><svg
+						height="20px"
+						viewBox="0 0 32 32"
+						xmlns="http://www.w3.org/2000/svg"
+						fill="#000000"
 						><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g
 							id="SVGRepo_tracerCarrier"
 							stroke-linecap="round"
@@ -87,18 +93,68 @@
 					></span
 				> <span class="nav-text">Stocks</span>
 			</a>
+			<a
+				href="/super_admin/sales"
+				class:active={currentPath.startsWith("/super_admin/sales")}
+				data-tooltip="Sales"
+			>
+				
+				<span class="nav-icon"
+					><svg
+						width="20px"
+						height="20px"
+						viewBox="0 0 512 512"
+						version="1.1"
+						xmlns="http://www.w3.org/2000/svg"
+						xmlns:xlink="http://www.w3.org/1999/xlink"
+						fill="#000000"
+						><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g
+							id="SVGRepo_tracerCarrier"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+						></g><g id="SVGRepo_iconCarrier">
+							<title>report-linechart</title>
+							<g
+								id="Page-1"
+								stroke="none"
+								stroke-width="1"
+								fill="none"
+								fill-rule="evenodd"
+							>
+								<g
+									id="add"
+									fill="#ffffff"
+									transform="translate(42.666667, 85.333333)"
+								>
+									<path
+										d="M341.333333,1.42108547e-14 L426.666667,85.3333333 L426.666667,341.333333 L3.55271368e-14,341.333333 L3.55271368e-14,1.42108547e-14 L341.333333,1.42108547e-14 Z M330.666667,42.6666667 L42.6666667,42.6666667 L42.6666667,298.666667 L384,298.666667 L384,96 L330.666667,42.6666667 Z M106.666667,85.3333333 L106.666333,217.591333 L167.724208,141.269742 L232.938667,173.866667 L280.864376,130.738196 L295.135624,146.595138 L236.398693,199.458376 L173.589333,168.064 L120.324333,234.666333 L341.333333,234.666667 L341.333333,256 L85.3333333,256 L85.3333333,85.3333333 L106.666667,85.3333333 Z"
+										id="Combined-Shape"
+									>
+									</path>
+								</g>
+							</g>
+						</g></svg
+					></span> <span class="nav-text">Sales</span>
+			</a>
 		</nav>
 		<div class="footer">
 			<footer class="credits">
 				<p>
-					© 2026 <span class="dev-name" data-tooltip="📧 batidencee@gmail.com">
+					© 2026 <span
+						class="dev-name"
+						data-tooltip="📧 batidencee@gmail.com"
+					>
 						<strong>Dencelle</strong>
 					</span>
 				</p>
 			</footer>
 			<button class="logout-btn" on:click={logout} data-tooltip="Logout">
 				<span class="icon"
-					><svg height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+					><svg
+						height="20px"
+						viewBox="0 0 24 24"
+						fill="none"
+						xmlns="http://www.w3.org/2000/svg"
 						><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g
 							id="SVGRepo_tracerCarrier"
 							stroke-linecap="round"
@@ -125,8 +181,10 @@
 			<button
 				class="sidebar-toggle"
 				on:click={() => (isSidebarCollapsed = !isSidebarCollapsed)}
-				aria-label={isSidebarCollapsed ? 'Open sidebar' : 'Close sidebar'}
-				title={isSidebarCollapsed ? 'Open sidebar' : 'Close sidebar'}
+				aria-label={isSidebarCollapsed
+					? "Open sidebar"
+					: "Close sidebar"}
+				title={isSidebarCollapsed ? "Open sidebar" : "Close sidebar"}
 			>
 				<svg viewBox="0 0 24 24" aria-hidden="true">
 					<path
@@ -172,8 +230,11 @@
 		--sidebar-width: 230px;
 		display: flex;
 		min-height: 100vh;
-		background:
-			radial-gradient(circle at top left, rgba(56, 189, 248, 0.08), transparent 35%),
+		background: radial-gradient(
+				circle at top left,
+				rgba(56, 189, 248, 0.08),
+				transparent 35%
+			),
 			linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
 		position: relative;
 		margin: 0;
@@ -218,9 +279,16 @@
 	}
 	.sidenav {
 		width: var(--sidebar-width);
-		background:
-			linear-gradient(180deg, rgba(15, 23, 42, 0.98) 0%, rgba(15, 23, 42, 0.92) 100%),
-			radial-gradient(circle at top left, rgba(56, 189, 248, 0.16), transparent 45%);
+		background: linear-gradient(
+				180deg,
+				rgba(15, 23, 42, 0.98) 0%,
+				rgba(15, 23, 42, 0.92) 100%
+			),
+			radial-gradient(
+				circle at top left,
+				rgba(56, 189, 248, 0.16),
+				transparent 45%
+			);
 		box-shadow: 0 24px 55px rgba(15, 23, 42, 0.3);
 		color: white;
 		display: flex;
@@ -237,7 +305,7 @@
 	.sidebar-header {
 		padding: 20px 10px;
 		display: flex;
-		
+
 		align-items: center;
 		justify-content: center;
 		margin-top: 0;
@@ -247,22 +315,28 @@
 		flex-shrink: 0;
 	}
 	.sidebar-toggle {
-		position: relative;
-		width: 40px;
-		height: 40px;
+		position: fixed;
+		top: 20px;
+		/* left: calc(var(--sidebar-width) + 20px); */
+		width: 44px;
+		height: 44px;
 		border-radius: 12px;
 		border: 1px solid rgba(148, 163, 184, 0.22);
-		background: rgba(15, 23, 42, 0.06);
+		background: rgba(255, 255, 255, 0.95);
+		backdrop-filter: blur(6px);
 		color: #0f172a;
 		display: flex;
+		opacity: 30%;
 		align-items: center;
 		justify-content: center;
 		cursor: pointer;
+		box-shadow: 0 4px 14px rgba(15, 23, 42, 0.12);
 		transition:
+			left 0.3s ease,
 			transform 0.2s ease,
 			color 0.2s ease,
 			opacity 0.2s ease;
-		z-index: 120;
+		z-index: 105;
 		padding: 0;
 	}
 	.sidebar-toggle:hover {
@@ -270,11 +344,7 @@
 		background: rgba(15, 23, 42, 0.1);
 	}
 	.content-header {
-		display: flex;
-		align-items: center;
-		justify-content: flex-start;
-		padding: 0 0 0.9rem 0;
-		margin-bottom: 0.25rem;
+		display: contents;
 	}
 	.sidebar-toggle svg {
 		width: 22px;
@@ -294,7 +364,7 @@
 		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 		object-fit: contain;
 	}
-	 /* 4. NAVIGATION */
+	/* 4. NAVIGATION */
 	nav {
 		flex: 1;
 		padding: 8px 8px;
@@ -450,7 +520,7 @@
 	}
 
 	.dev-name:hover::before {
-		content: '';
+		content: "";
 		position: absolute;
 		bottom: 105%;
 		left: 50%;
@@ -468,12 +538,13 @@
 	.content {
 		flex: 1;
 		margin-left: var(--sidebar-width);
-		padding: 20px 20px 20px;
+		padding: 84px 20px 20px;
 		width: 100%;
+		transition: margin-left 0.3s ease;
 	}
 	@media (max-width: 1024px) {
 		.content {
-			padding: 15px;
+			padding: 84px 15px 15px;
 		}
 	}
 	@media (max-width: 768px) {
@@ -487,7 +558,7 @@
 			display: none;
 		}
 		.content {
-			padding: 14px 12px 16px;
+			padding: 80px 12px 16px;
 			margin-left: 0;
 		}
 		.sidenav {
@@ -503,9 +574,6 @@
 		.admin-layout.collapsed .sidenav {
 			box-shadow: none;
 		}
-		.content-header {
-			padding-bottom: 0.75rem;
-		}
 		.sidebar-header {
 			flex-direction: row;
 			align-items: center;
@@ -514,12 +582,10 @@
 			gap: 8px;
 		}
 		.logo-img,
-	
 		.nav-text {
 			display: block;
 		}
 		.admin-layout.collapsed .logo-img,
-	
 		.admin-layout.collapsed .nav-text,
 		.admin-layout.collapsed .credits {
 			display: none;
@@ -546,7 +612,7 @@
 	}
 	@media (max-width: 480px) {
 		.content {
-			padding: 10px;
+			padding: 74px 10px 10px;
 		}
 		.sidenav {
 			width: min(86vw, 300px);
@@ -555,8 +621,5 @@
 			width: 38px;
 			height: 38px;
 		}
-	}
-	.content-header {
-		padding-bottom: 0.6rem;
 	}
 </style>

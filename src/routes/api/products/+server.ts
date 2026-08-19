@@ -1,6 +1,7 @@
 import { json } from "@sveltejs/kit";
 import { ProductService } from '$lib/server/services/productService';
-import { validateData, productCreateSchema, productUpdateSchema, restockSchema } from '$lib/server/validation';
+import { validateData, productCreateSchema, productUpdateSchema, restockSchema } from '../../../lib/server/validation';
+
 
 // ✅ Input sanitization
 function sanitizeString(val: any): string {

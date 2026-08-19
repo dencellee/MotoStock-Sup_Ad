@@ -2,7 +2,6 @@
 
 declare global {
     namespace App {
-        // interface Error {}
         interface Locals {
             user: {
                 id: number;
@@ -10,12 +9,8 @@ declare global {
                 role: 'admin' | 'staff' | 'super_admin';
             } | null;
         }
-        // interface PageData {}
-        // interface PageState {}
-        // interface Platform {}
     }
 
-    // 🚀 ADD THIS: This tells TypeScript that "window.pos" exists in your UI
     interface Window {
         pos: {
             version: string;
@@ -26,18 +21,6 @@ declare global {
             printReceipt: (data: any) => Promise<void>;
             sendNotification: (message: string) => void;
         };
-    }
-}
-
-declare global {
-    namespace App {
-        interface Locals {
-            user?: {
-                id: number;
-                username: string;
-                role: string;
-            };
-        }
     }
 }
 

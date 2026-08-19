@@ -1,5 +1,5 @@
 import { db } from '$lib/server/db';
-import { products, sales, expenses } from '$lib/server/db/schema';
+import { products, sales, salePayments, expenses, jobOrders, jobOrderItems } from '$lib/server/db/schema';
 import { eq, sql, desc, lte, asc, and } from 'drizzle-orm';
 import type { PageServerLoad } from './$types';
 
@@ -12,13 +12,15 @@ export const load: PageServerLoad = async ({ url }) => {
     let prevEnd = new Date();
     let chartSql: any;
 
+    // Unpaid Term sales aren't collected yet — exclude from every revenue query
+    const paidOnly = sql`(${sales.paymentMode} != 'TERM' OR ${sales.settled} = true)`;
+
     // 1. SET TIME BOUNDARIES
     if (filter === 'daily') {
         metricStart.setHours(0, 0, 0, 0);
         prevStart = new Date(metricStart);
         prevStart.setDate(metricStart.getDate() - 1);
         prevEnd = new Date(metricStart);
-        // Postgres: format hour as HH24:00
         chartSql = sql`to_char(${sales.createdAt}, 'HH24:00')`;
 
     } else if (filter === 'weekly') {
@@ -28,7 +30,6 @@ export const load: PageServerLoad = async ({ url }) => {
         prevStart = new Date(metricStart);
         prevStart.setDate(metricStart.getDate() - 7);
         prevEnd = new Date(metricStart);
-        // Postgres: format as MM/DD
         chartSql = sql`to_char(${sales.createdAt}, 'MM/DD')`;
 
     } else if (filter === 'monthly') {
@@ -36,111 +37,157 @@ export const load: PageServerLoad = async ({ url }) => {
         prevStart = new Date(metricStart);
         prevStart.setMonth(metricStart.getMonth() - 1);
         prevEnd = new Date(metricStart);
-        // Postgres: week number within month
         chartSql = sql`floor((extract(day from ${sales.createdAt}) - 1) / 7) + 1`;
 
     } else {
-        // All time
-        metricStart = new Date(0);
-        prevStart = new Date(0);
-        prevEnd = new Date(0);
-        // Postgres: format as YYYY-MM
-        chartSql = sql`to_char(${sales.createdAt}, 'YYYY-MM')`;
+        // yearly — Jan 1 of this year through now, trend grouped by month
+        metricStart = new Date(now.getFullYear(), 0, 1);
+        prevStart = new Date(now.getFullYear() - 1, 0, 1);
+        prevEnd = new Date(metricStart);
+        chartSql = sql`to_char(${sales.createdAt}, 'Mon')`;
     }
 
     const metricStartDate = new Date(metricStart.getTime());
     const pStartDate = new Date(prevStart.getTime());
     const pEndDate = new Date(prevEnd.getTime());
 
-    // 2. FETCH ALL DATA IN PARALLEL
-    const [metrics, prev, exp, prevExp, lowStock, topSellers, payments, trends] = await Promise.all([
+    // 2. FETCH ALL DATA IN PARALLEL (BATCHED)
+    let metrics: any[], prev: any[], exp: any[], prevExp: any[];
+    let lowStock: any[], topSellers: any[], payments: any[];
+    let trends: any[], splitBreakdown: any[];
+    let openJobOrders: any[], jobOrderRevenue: any[];
 
-        // Current period: gross revenue + COGS
+    [metrics, prev, exp, prevExp] = await Promise.all([
+
         db.select({
             gross: sql<number>`COALESCE(SUM(${sales.totalPrice}), 0)`,
-            cogs:  sql<number>`COALESCE(SUM(${sales.costAtSale} * ${sales.quantity}), 0)`
+            cogs: sql<number>`COALESCE(SUM(${sales.costAtSale} * ${sales.quantity}), 0)`,
+            units: sql<number>`COALESCE(SUM(${sales.quantity}), 0)`
         })
-        .from(sales)
-        .where(sql`${sales.createdAt} >= ${metricStartDate}`),
+            .from(sales)
+            .where(and(
+                sql`${sales.createdAt} >= ${metricStartDate}`,
+                paidOnly
+            )),
 
-        // Previous period: gross revenue
         db.select({
             gross: sql<number>`COALESCE(SUM(${sales.totalPrice}), 0)`
         })
-        .from(sales)
-        .where(and(
-            sql`${sales.createdAt} >= ${pStartDate}`,
-            sql`${sales.createdAt} < ${pEndDate}`
-        )),
+            .from(sales)
+            .where(and(
+                sql`${sales.createdAt} >= ${pStartDate}`,
+                sql`${sales.createdAt} < ${pEndDate}`,
+                paidOnly
+            )),
 
-        // Current period: expenses
         db.select({
             total: sql<number>`COALESCE(SUM(${expenses.amount}), 0)`
         })
-        .from(expenses)
-        .where(sql`${expenses.createdAt} >= ${metricStartDate}`),
+            .from(expenses)
+            .where(sql`${expenses.createdAt} >= ${metricStartDate}`),
 
-        // Previous period: expenses
         db.select({
             total: sql<number>`COALESCE(SUM(${expenses.amount}), 0)`
         })
-        .from(expenses)
-        .where(and(
-            sql`${expenses.createdAt} >= ${pStartDate}`,
-            sql`${expenses.createdAt} < ${pEndDate}`
-        )),
-
-        // Low stock items (quantity <= 5)
-        db.select({
-            name:  products.name,
-            color: products.color,
-            size:  products.size,
-            stock: products.quantity
-        })
-        .from(products)
-        .where(lte(products.quantity, 5))
-        .orderBy(asc(products.quantity)),
-
-        // Top 5 selling products
-        db.select({
-            name: sql<string>`COALESCE(${products.name}, 'Unknown')`,
-            sold: sql<number>`SUM(${sales.quantity})`
-        })
-        .from(sales)
-        .leftJoin(products, eq(sales.productId, products.id))
-        .where(sql`${sales.createdAt} >= ${metricStartDate}`)
-        .groupBy(products.name)                          // ✅ explicit groupBy
-        .orderBy(desc(sql`SUM(${sales.quantity})`))
-        .limit(5),
-
-        // Payment mode breakdown
-        db.select({
-            mode:  sales.paymentMode,
-            total: sql<number>`COALESCE(SUM(${sales.totalPrice}), 0)`
-        })
-        .from(sales)
-        .where(sql`${sales.createdAt} >= ${metricStartDate}`)
-        .groupBy(sales.paymentMode),
-
-        // Chart trend data
-        db.select({
-            label:   chartSql,
-            revenue: sql<number>`COALESCE(SUM(${sales.totalPrice}), 0)`,
-            cogs:    sql<number>`COALESCE(SUM(${sales.costAtSale} * ${sales.quantity}), 0)`,
-            units:   sql<number>`COALESCE(SUM(${sales.quantity}), 0)`
-        })
-        .from(sales)
-        .where(sql`${sales.createdAt} >= ${metricStartDate}`)
-        .groupBy(sql`1`)
-        .orderBy(asc(sql`MIN(${sales.createdAt})`))
+            .from(expenses)
+            .where(and(
+                sql`${expenses.createdAt} >= ${pStartDate}`,
+                sql`${expenses.createdAt} < ${pEndDate}`
+            ))
     ]);
 
-    // 3. GAP FILLING — ensure every time slot has a value (even if 0)
+    [lowStock, topSellers, payments] = await Promise.all([
+
+        db.select({
+            name: products.name,
+            brand: products.brand,
+            color: products.color,
+            size: products.size,
+            stock: products.quantity
+        })
+            .from(products)
+            .where(lte(products.quantity, 5))
+            .orderBy(asc(products.quantity)),
+
+        // Top 10 selling products
+        db.select({
+            name: sql<string>`COALESCE(${products.name}, 'Unknown')`,
+            sold: sql<number>`SUM(${sales.quantity})`,
+            revenue: sql<number>`COALESCE(SUM(${sales.totalPrice}), 0)`
+        })
+            .from(sales)
+            .leftJoin(products, eq(sales.productId, products.id))
+            .where(and(
+                sql`${sales.createdAt} >= ${metricStartDate}`,
+                paidOnly
+            ))
+            .groupBy(products.name)
+            .orderBy(desc(sql`SUM(${sales.quantity})`))
+            .limit(10),
+
+        db.select({
+            mode: sales.paymentMode,
+            total: sql<number>`COALESCE(SUM(${sales.totalPrice}), 0)`,
+            count: sql<number>`COUNT(*)`
+        })
+            .from(sales)
+            .where(and(
+                sql`${sales.createdAt} >= ${metricStartDate}`,
+                paidOnly
+            ))
+            .groupBy(sales.paymentMode)
+    ]);
+
+    [trends, splitBreakdown, openJobOrders, jobOrderRevenue] = await Promise.all([
+
+        db.select({
+            label: chartSql,
+            revenue: sql<number>`COALESCE(SUM(${sales.totalPrice}), 0)`,
+            cogs: sql<number>`COALESCE(SUM(${sales.costAtSale} * ${sales.quantity}), 0)`,
+            units: sql<number>`COALESCE(SUM(${sales.quantity}), 0)`
+        })
+            .from(sales)
+            .where(and(
+                sql`${sales.createdAt} >= ${metricStartDate}`,
+                paidOnly
+            ))
+            .groupBy(sql`1`)
+            .orderBy(asc(sql`MIN(${sales.createdAt})`)),
+
+        db.select({
+            mode: salePayments.paymentMode,
+            total: sql<number>`COALESCE(SUM(${salePayments.amount}), 0)`,
+            count: sql<number>`COUNT(*)`
+        })
+            .from(salePayments)
+            .innerJoin(sales, eq(sales.transactionId, salePayments.transactionId))
+            .where(and(
+                sql`${sales.createdAt} >= ${metricStartDate}`,
+                eq(sales.paymentMode, 'SPLIT')
+            ))
+            .groupBy(salePayments.paymentMode),
+
+        db.select({
+            count: sql<number>`COUNT(*)`,
+            oldestDate: sql<string>`MIN(${jobOrders.createdAt})`
+        })
+            .from(jobOrders)
+            .where(eq(jobOrders.status, 'open')),
+
+        db.select({
+            outstanding: sql<number>`COALESCE(SUM(${jobOrderItems.totalPrice}),0)`
+        })
+            .from(jobOrderItems)
+            .innerJoin(jobOrders, eq(jobOrderItems.jobOrderId, jobOrders.id))
+            .where(eq(jobOrders.status, 'open'))
+    ]);
+
+    // 3. GAP FILLING
     type TrendItem = { label: string | null; revenue: number; cogs: number; units: number };
-    const finalLabels:  string[] = [];
+    const finalLabels: string[] = [];
     const finalRevenue: number[] = [];
-    const finalCogs:    number[] = [];
-    const finalUnits:   number[] = [];
+    const finalCogs: number[] = [];
+    const finalUnits: number[] = [];
 
     if (filter === 'daily') {
         const currentHour = now.getHours();
@@ -149,8 +196,8 @@ export const load: PageServerLoad = async ({ url }) => {
             const match = trends.find((t: TrendItem) => String(t.label).trim() === label);
             finalLabels.push(label);
             finalRevenue.push(match ? Number(match.revenue) : 0);
-            finalCogs.push(match   ? Number(match.cogs)    : 0);
-            finalUnits.push(match  ? Number(match.units)   : 0);
+            finalCogs.push(match ? Number(match.cogs) : 0);
+            finalUnits.push(match ? Number(match.units) : 0);
         }
 
     } else if (filter === 'weekly') {
@@ -162,8 +209,8 @@ export const load: PageServerLoad = async ({ url }) => {
             const match = trends.find((t: TrendItem) => String(t.label).trim() === label);
             finalLabels.push(label);
             finalRevenue.push(match ? Number(match.revenue) : 0);
-            finalCogs.push(match   ? Number(match.cogs)    : 0);
-            finalUnits.push(match  ? Number(match.units)   : 0);
+            finalCogs.push(match ? Number(match.cogs) : 0);
+            finalUnits.push(match ? Number(match.units) : 0);
         }
 
     } else if (filter === 'monthly') {
@@ -174,55 +221,98 @@ export const load: PageServerLoad = async ({ url }) => {
             const match = trends.find((t: TrendItem) => Number(t.label) === i);
             finalLabels.push(label);
             finalRevenue.push(match ? Number(match.revenue) : 0);
-            finalCogs.push(match   ? Number(match.cogs)    : 0);
-            finalUnits.push(match  ? Number(match.units)   : 0);
+            finalCogs.push(match ? Number(match.cogs) : 0);
+            finalUnits.push(match ? Number(match.units) : 0);
         }
 
     } else {
-        // All time — use raw labels from DB
-        for (const t of trends as TrendItem[]) {
-            finalLabels.push(String(t.label ?? ''));
-            finalRevenue.push(Number(t.revenue) || 0);
-            finalCogs.push(Number(t.cogs)       || 0);
-            finalUnits.push(Number(t.units)     || 0);
+        // yearly
+        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const currentMonth = now.getMonth();
+        for (let i = 0; i <= currentMonth; i++) {
+            const label = monthNames[i];
+            const match = trends.find((t: TrendItem) => String(t.label).trim() === label);
+            finalLabels.push(label);
+            finalRevenue.push(match ? Number(match.revenue) : 0);
+            finalCogs.push(match ? Number(match.cogs) : 0);
+            finalUnits.push(match ? Number(match.units) : 0);
         }
     }
 
     // 4. COMPUTE SUMMARY STATS
-    const curS  = Number(metrics[0]?.gross ?? 0);
-    const preS  = Number(prev[0]?.gross    ?? 0);
-    const curE  = Number(exp[0]?.total     ?? 0);
-    const preE  = Number(prevExp[0]?.total ?? 0);
-    const cogs  = Number(metrics[0]?.cogs  ?? 0);
+    const curS = Number(metrics[0]?.gross ?? 0);
+    const preS = Number(prev[0]?.gross ?? 0);
+    const curE = Number(exp[0]?.total ?? 0);
+    const preE = Number(prevExp[0]?.total ?? 0);
+    const cogs = Number(metrics[0]?.cogs ?? 0);
+
+    const grossProfit = curS - cogs;
+    const netProfit = grossProfit - curE;
+    const grossMargin = curS > 0 ? parseFloat(((grossProfit / curS) * 100).toFixed(1)) : 0;
+    const netMargin = curS > 0 ? parseFloat(((netProfit / curS) * 100).toFixed(1)) : 0;
 
     const getPct = (c: number, p: number) =>
         p === 0 ? 0 : parseFloat((((c - p) / p) * 100).toFixed(1));
 
+    const NON_SPLIT_MODES = ['CASH', 'GCASH', 'BANK', 'CARD', 'TikTok', 'Shopee', 'Lazada'];
+    const baseBreakdown = payments.filter((p: any) => NON_SPLIT_MODES.includes(p.mode));
+
+    const breakdownMap = new Map<string, { mode: string; total: number; count: number }>();
+    for (const p of baseBreakdown) {
+        breakdownMap.set(p.mode, { mode: String(p.mode), total: Number(p.total), count: Number(p.count) });
+    }
+    for (const s of splitBreakdown) {
+        const mode = String(s.mode);
+        const existing = breakdownMap.get(mode);
+        if (existing) {
+            existing.total += Number(s.total);
+            existing.count += Number(s.count);
+        } else {
+            breakdownMap.set(mode, { mode, total: Number(s.total), count: Number(s.count) });
+        }
+    }
+    const mergedPaymentBreakdown = Array.from(breakdownMap.values());
+
+    const openJobCount = Number(openJobOrders[0]?.count ?? 0);
+    const oldestOpenDate = openJobOrders[0]?.oldestDate ?? null;
+    const outstanding = Number(jobOrderRevenue[0]?.outstanding ?? 0);
+
     return {
         activeFilter: filter,
         stats: {
-            totalSales:    curS,
-            salesChange:   getPct(curS, preS),
-            stockCost:     cogs,
-            shopExpenses:  curE,
-            expChange:     getPct(curE, preE),
-            netProfit:     curS - cogs - curE,
+            totalSales: curS,
+            salesChange: getPct(curS, preS),
+            totalUnits: Number(metrics[0]?.units ?? 0),
+            stockCost: cogs,
+            grossProfit,
+            grossMargin,
+            shopExpenses: curE,
+            expChange: getPct(curE, preE),
+            netProfit,
+            netMargin,
             lowStockCount: lowStock.length
         },
+        jobOrderStats: {
+            openCount: openJobCount,
+            outstanding,
+            oldestOpenDate: oldestOpenDate ? new Date(oldestOpenDate).toISOString() : null
+        },
         lowStockItems: lowStock,
-        topSellingProducts: topSellers.map((x: { name: string; sold: number }) => ({
+        topSellingProducts: topSellers.map((x: any) => ({
             name: String(x.name),
-            sold: Number(x.sold)
+            sold: Number(x.sold),
+            revenue: Number(x.revenue)
         })),
-        paymentBreakdown: payments.map((x: { mode: string; total: number }) => ({
-            mode:  String(x.mode),
-            total: Number(x.total)
+        paymentBreakdown: mergedPaymentBreakdown.map((x: any) => ({
+            mode: String(x.mode),
+            total: Number(x.total),
+            count: Number(x.count)
         })),
         chartData: {
-            labels:   finalLabels,
-            revenue:  finalRevenue,
+            labels: finalLabels,
+            revenue: finalRevenue,
             expenses: finalCogs,
-            units:    finalUnits
+            units: finalUnits
         }
     };
 };
