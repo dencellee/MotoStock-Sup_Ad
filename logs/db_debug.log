@@ -653,3 +653,25 @@
 [DB][2026-08-19T07:21:26.542Z] User:postgres.uciyiafsfguraufwdgsj
 [DB][2026-08-19T07:21:26.838Z] Reusing existing DB pool from previous module load (HMR).
 [DB][2026-08-19T07:21:26.841Z] index.ts module loaded — DB init running in background...
+[DB][2026-08-19T08:48:21.850Z] Running backend server entry
+[DB][2026-08-19T08:48:21.883Z] NODE_ENV:development
+[DB][2026-08-19T08:48:21.985Z] index.ts starting — loading environment...
+[DB][2026-08-19T08:48:22.112Z] Environment loaded.
+[DB][2026-08-19T08:48:22.129Z] DATABASE_URL set:true
+[DB][2026-08-19T08:48:22.146Z] DATABASE_URL preview:postgresql://[REDACTED]
+[DB][2026-08-19T08:48:22.153Z] Connecting to host:aws-1-ap-northeast-1.pooler.supabase.com:5432
+[DB][2026-08-19T08:48:22.193Z] Database:postgres
+[DB][2026-08-19T08:48:22.206Z] User:postgres.uciyiafsfguraufwdgsj
+[DB][2026-08-19T08:48:22.307Z] Reusing existing DB pool from previous module load (HMR).
+[DB][2026-08-19T08:48:22.318Z] index.ts module loaded — DB init running in background...
+[DB][2026-08-19T08:49:25.833Z] Running backend server entry
+[DB][2026-08-19T08:49:25.837Z] NODE_ENV:development
+[DB][2026-08-19T08:49:25.855Z] index.ts starting — loading environment...
+[DB][2026-08-19T08:49:25.875Z] Environment loaded.
+[DB][2026-08-19T08:49:25.881Z] DATABASE_URL set:true
+[DB][2026-08-19T08:49:25.894Z] DATABASE_URL preview:postgresql://[REDACTED]
+[DB][2026-08-19T08:49:25.902Z] Connecting to host:aws-1-ap-northeast-1.pooler.supabase.com:5432
+[DB][2026-08-19T08:49:25.917Z] Database:postgres
+[DB][2026-08-19T08:49:25.924Z] User:postgres.uciyiafsfguraufwdgsj
+[DB][2026-08-19T08:49:25.951Z] Reusing existing DB pool from previous module load (HMR).
+[DB][2026-08-19T08:49:25.958Z] index.ts module loaded — DB init running in background...

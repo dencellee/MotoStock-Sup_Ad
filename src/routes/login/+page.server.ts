@@ -3,40 +3,78 @@ import { fail, redirect } from "@sveltejs/kit";
 import bcrypt from "bcryptjs";
 import { db } from "$lib/server/db";
 import { users, loginAuditLog } from "$lib/server/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, and, gte, sql } from "drizzle-orm";
 
-// Simple in-memory rate limiting (for demo/dev only)
-// Replace with Redis or similar in production for distributed rate limiting
-const loginAttempts = new Map<string, { count: number; resetAt: number }>();
+const MAX_ATTEMPTS = 10;
+const LOCKOUT_WINDOW_MINUTES = 15;
 
 function getClientIP(request: Request): string {
-    // Try to get IP from X-Forwarded-For or remote address
     const forwarded = request.headers.get('x-forwarded-for');
     if (forwarded) return forwarded.split(',')[0].trim();
     // @ts-ignore: node specific
     return (request as any).ip || 'unknown';
 }
 
-function checkRateLimit(ip: string): boolean {
-    // Always allow in dev; implement real logic in production
-    return true;
+/**
+ * DB-backed lockout check using the existing loginAuditLog table.
+ * Counts recent 'failed' attempts for this username within the window.
+ */
+async function checkLoginLockout(username: string): Promise<{ locked: boolean; retryAfterSeconds?: number }> {
+    const windowStart = new Date(Date.now() - LOCKOUT_WINDOW_MINUTES * 60 * 1000);
+
+    try {
+        const result = await db
+            .select({ count: sql<number>`count(*)` })
+            .from(loginAuditLog)
+            .where(
+                and(
+                    eq(loginAuditLog.username, username),
+                    eq(loginAuditLog.status, 'failed'),
+                    gte(loginAuditLog.loginTime, windowStart)
+                )
+            );
+
+        const failureCount = Number(result[0]?.count ?? 0);
+        if (failureCount >= MAX_ATTEMPTS) {
+            return { locked: true, retryAfterSeconds: LOCKOUT_WINDOW_MINUTES * 60 };
+        }
+        return { locked: false };
+    } catch (err) {
+        console.error('[LOGIN] Lockout check failed, failing open:', err);
+        return { locked: false };
+    }
+}
+
+async function recordLoginAttempt(opts: {
+    userId: number;
+    username: string;
+    ipAddress: string;
+    userAgent: string;
+    status: 'success' | 'failed';
+}) {
+    try {
+        await db.insert(loginAuditLog).values({
+            userId: opts.userId,
+            username: opts.username,
+            ipAddress: opts.ipAddress,
+            userAgent: opts.userAgent,
+            status: opts.status,
+            loginTime: new Date()
+        });
+    } catch (auditErr) {
+        console.error('[LOGIN] Failed to log audit entry:', auditErr);
+    }
 }
 
 export const actions: Actions = {
     default: async ({ request, cookies, getClientAddress }) => {
-        // Only allow POST requests (prevent GET attacks)
         if (request.method !== 'POST') {
             return fail(405, { error: 'Method not allowed' });
         }
 
-        // Get client IP
         const clientIP = getClientAddress() || getClientIP(request);
+        const userAgent = request.headers.get('user-agent') || 'Unknown';
         console.log('[LOGIN] POST attempt from IP:', clientIP);
-
-        // Rate limiting (no-op in dev)
-        if (!checkRateLimit(clientIP)) {
-            return fail(429, { error: "Too many login attempts. Try again later." });
-        }
 
         const data = await request.formData();
         const username = data.get("username")?.toString().trim();
@@ -44,18 +82,24 @@ export const actions: Actions = {
         console.log('[LOGIN] Submitted username:', username);
 
         if (!username || !password) {
-            // Never reveal which field is missing (security best practice)
             return fail(400, { error: "Missing credentials" });
         }
 
-        // Validate username format (prevent injection)
         if (!/^[a-zA-Z0-9_-]{3,32}$/.test(username)) {
             return fail(400, { error: "Invalid username format" });
         }
 
-        // Runtime checks (optional, can remove in production)
         if (!db) return fail(500, { error: 'Database not initialized' });
         if (!users) return fail(500, { error: 'User schema not loaded' });
+
+        // 🔒 Brute-force lockout check — BEFORE touching the password at all
+        const lockout = await checkLoginLockout(username);
+        if (lockout.locked) {
+            console.warn(`[LOGIN] Locked out: ${username} from IP: ${clientIP}`);
+            return fail(429, {
+                error: `Too many failed attempts. Try again in ${Math.ceil((lockout.retryAfterSeconds ?? 900) / 60)} minutes.`
+            });
+        }
 
         let userResult;
         try {
@@ -69,10 +113,9 @@ export const actions: Actions = {
         }
 
         if (userResult.length === 0) {
-            // Generic error message (don't reveal if user exists)
             console.warn('[LOGIN] No user found for username:', username);
-            // Add delay to prevent username enumeration
-            await new Promise(r => setTimeout(r, 200));
+           await recordLoginAttempt({ userId: 0, username, ipAddress: clientIP, userAgent, status: 'failed' });
+            await new Promise(r => setTimeout(r, 400));
             return fail(401, { error: "Invalid username or password" });
         }
 
@@ -86,42 +129,24 @@ export const actions: Actions = {
 
         if (!valid) {
             console.warn('[LOGIN] Invalid password for user:', username);
-            // Add delay to prevent timing attacks
-            await new Promise(r => setTimeout(r, 200));
+            await recordLoginAttempt({ userId: dbUser.id, username, ipAddress: clientIP, userAgent, status: 'failed' });
+            await new Promise(r => setTimeout(r, 400));
             return fail(401, { error: "Invalid username or password" });
         }
 
-        // ✅ PRODUCTION SECURITY: Only super_admin can login
         if (dbUser.role !== 'super_admin') {
             console.warn(`[LOGIN] Non-admin user attempted login: ${username} (role: ${dbUser.role}) from IP: ${clientIP}`);
-            // Generic error message (security)
-            await new Promise(r => setTimeout(r, 200));
+            await recordLoginAttempt({ userId: dbUser.id, username, ipAddress: clientIP, userAgent, status: 'failed' });
+            await new Promise(r => setTimeout(r, 400));
             return fail(401, { error: "Invalid username or password" });
         }
-
-        // Clear rate limit on successful login
-        loginAttempts.delete(clientIP);
 
         const isProduction = process.env.NODE_ENV === 'production';
 
-        // 📍 Log successful admin login with IP for monitoring
         console.log(`[LOGIN] ✅ Super admin login successful: ${username} from IP: ${clientIP}`);
 
-        // 📊 Store login audit log for monitoring
-        const userAgent = request.headers.get('user-agent') || 'Unknown';
-        try {
-            await db.insert(loginAuditLog).values({
-                userId: dbUser.id,
-                username: dbUser.username,
-                ipAddress: clientIP,
-                userAgent: userAgent,
-                status: 'success',
-                loginTime: new Date()
-            });
-        } catch (auditErr) {
-            console.error('[LOGIN] Failed to log audit entry:', auditErr);
-            // Continue with login even if audit fails (don't block auth)
-        }
+        // Also resets lockout, since we only count 'failed' rows in the window
+        await recordLoginAttempt({ userId: dbUser.id, username, ipAddress: clientIP, userAgent, status: 'success' });
 
         try {
             cookies.set(
@@ -129,15 +154,13 @@ export const actions: Actions = {
                 JSON.stringify({ id: dbUser.id, role: dbUser.role, username: dbUser.username }),
                 {
                     path: "/",
-                    httpOnly: true,           // Prevent JavaScript from accessing the cookie
-                    sameSite: "strict",       // Only send cookie to same site (CSRF protection)
-                    secure: isProduction,     // HTTPS only in production, allow HTTP in dev
-                    maxAge: 60 * 60 * 24 * 7, // 7 days
-                    domain: undefined          // Let browser use current domain
+                    httpOnly: true,
+                    sameSite: "strict",
+                    secure: isProduction,
+                    maxAge: 60 * 60 * 24 * 7,
+                    domain: undefined
                 }
             );
-            
-            // Clear password from memory (defense in depth)
             Object.assign(dbUser, { passwordHash: undefined });
         } catch (err) {
             return fail(500, { error: 'Failed to set session cookie' });
@@ -152,4 +175,3 @@ export const actions: Actions = {
         }
     }
 };
-
