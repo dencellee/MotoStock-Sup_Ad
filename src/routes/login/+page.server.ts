@@ -156,13 +156,13 @@ export const actions: Actions = {
             const SHORT_SESSION = 60 * 60 * 8;      // 8 hours — normal session
             const REMEMBER_SESSION = 60 * 60 * 24 * 30; // 30 days — "Remember me"
 
-            cookies.set(
+             cookies.set(
                 "session",
                 JSON.stringify({ id: dbUser.id, role: dbUser.role, username: dbUser.username }),
                 {
                     path: "/",
                     httpOnly: true,
-                    sameSite: "strict",
+                    sameSite: "lax",   // changed from "strict"
                     secure: isProduction,
                     maxAge: rememberMe ? REMEMBER_SESSION : SHORT_SESSION,
                     domain: undefined

@@ -326,7 +326,7 @@
 		backdrop-filter: blur(6px);
 		color: #0f172a;
 		display: flex;
-		opacity: 30%;
+		opacity: 80%;
 		align-items: center;
 		justify-content: center;
 		cursor: pointer;

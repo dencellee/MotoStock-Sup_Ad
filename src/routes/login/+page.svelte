@@ -5,7 +5,7 @@
 	let isLoading = false;
 	let showPassword = false;
 	let rememberMe = false;
-	export let form;
+	export let form: { error?: string; locked?: boolean; retryAfterSeconds?: number } | null = null;
 	$: errorMessage = form?.error;
 
 	let lockoutSeconds = 0;

@@ -157,7 +157,7 @@ export class ProductService {
         });
     }
 
-    static async getAllProducts() {
+        static async getAllProducts() {
         return await db.select({
             id: products.id,
             name: products.name,
@@ -175,7 +175,8 @@ export class ProductService {
         })
         .from(products)
         .leftJoin(categories, eq(products.categoryId, categories.id))
-        .orderBy(desc(products.id)); // price/cost will be string from DB
+        .where(eq(products.archived, false))
+        .orderBy(desc(products.id));
     }
 
     static async deleteProduct(id: number, userId: number, userName: string) {
